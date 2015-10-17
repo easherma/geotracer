@@ -8,6 +8,7 @@
 <script src='https://api.mapbox.com/mapbox.js/v2.2.2/mapbox.js'></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.js"></script>
+<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
 <link rel="stylesheet" href="pelias/pelias-leaflet-geocoder.css">
 <script src="pelias/pelias-leaflet-geocoder.js"></script>
 <!--<link href='https://api.mapbox.com/mapbox.js/v2.2.2/mapbox.css' rel='stylesheet' />-->
@@ -51,17 +52,13 @@
 // amount of time regardless of trip length.
 
 // Show the whole world in this first view.
-/*
 map = L.map('map')
     .setView([20, 0], 2);
-*/
-var map = L.map('map').setView([40.7259, -73.9805], 12);
+//var map = L.map('map').setView([40.7259, -73.9805], 12);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-/*
 var credits = L.control.attribution({
   prefix: '<a href="http://openflights.org/data.html">Flight data from Open Flights, under the ODbL license</a>'
 }).addTo(map);
-*/
 // Disable drag and zoom handlers.
 // Making this effect work with zooming and panning
 // would require a different technique with different
@@ -72,20 +69,96 @@ map.doubleClickZoom.disable();
 map.scrollWheelZoom.disable();
 if (map.tap) map.tap.disable();
 
-L.control.geocoder("<INSERT KEY HERE>", {
+L.control.geocoder('<ADD MAPZEN SEARCH API KEY HERE', {
   position: 'topright'
 }).addTo(map);
 
-// Transform the short [lat,lng] format in our
-// data into the {x, y} expected by arc.js.
-function obj(ll) { return { y: ll[0], x: ll[1] }; }
+// Transform a GeoJSON string '{type:"Point",coordinates:[x,y]}'
+// into the {x,y} expected by arc.js.
+function geoJSONToXY(ptStr) {
+  var p = JSON.parse(ptStr);
+  return {y: p.coordinates[0], x: p.coordinates[1]};
+}
 
-for (var i = 0; i < pairs.length; i++) {
-    // Transform each pair of coordinates into a pretty
+var sql = new cartodb.SQL({ 
+  user : '<ADD CARTODB USERNAME HERE>',
+  api_key : 'ADD CARTODB API KEY HERE>'
+});
+
+
+// For development purposes, populate database, if empty
+var checkEmptyQuery = "SELECT count(*) FROM geopaths;";
+sql.execute(checkEmptyQuery)
+  .done(function(data){
+    if (data.rows[0].count === 0) {
+      populateDB()
+      var msg = "CartoDB table has been seeded with testing data." +
+                " Refresh page after 2 sec for updated map.";
+      setTimeout(function(){ alert(msg); }, 3000);
+    }
+  })
+  .error(function(err){
+    console.log('error: ' + err);
+  })
+
+// Load all paths from CartoDB and start plotting
+var selectAllQuery = "SELECT cartodb_id," +
+            "ST_AsGeoJSON(p1) as p1," +
+            "ST_AsGeoJSON(p2) as p2," +
+            "ST_AsGeoJSON(p3) as p3," +
+            "ST_AsGeoJSON(p4) as p4," +
+            "ST_AsGeoJSON(p5) as p5 " +
+            "FROM geopaths;";
+sql.execute(selectAllQuery)
+  .done(function(data) {
+    data.rows.forEach(function(row,i){
+      if(row.p1 != null && row.p2 != null){
+        plotArc(geoJSONToXY(row.p1),geoJSONToXY(row.p2),i);
+      }
+    });
+  })
+  .error(function(errors) {
+    // errors contains a list of errors
+    console.log("errors:" + errors);
+  })
+
+
+// For development purposes, populate table 
+//  with a handful of points from flights.js
+function populateDB(){
+  // Make PostGIS points from array of pairs of points
+  // of the form: [[pt_A,pt_B],[pt_C,pt_D]]
+  for (var i = 0; i < 50 && i < pairs.length; i++){
+    // Define column values for insert
+    var p1 = "(SELECT ST_SetSRID(ST_MakePoint(" + 
+                pairs[i][0][0] + "," +
+                pairs[i][0][1] + "),4326))";
+    var p2 = "(SELECT ST_SetSRID(ST_MakePoint(" + 
+                pairs[i][1][0] + "," +
+                pairs[i][1][1] + "),4326))";
+    var lastEdited = "to_timestamp(" + Date.now() + ")";
+    
+    //Insert new row into CartoDB
+    var q = "INSERT INTO geopaths " +
+            "  (lastedited,p1,p2) " +
+            "VALUES ({{lastEdited}},{{p1}},{{p2}});";
+    var args = {
+      'p1' : p1,
+      'p2' : p2,
+      'lastEdited' : lastEdited
+    };
+
+    sql.execute(q,args)
+      .error(function(err){
+        console.log('errors: ' + err);
+      })
+  }
+}
+
+function plotArc(p1,p2,animationOffset){
+    // Transform pair of coordinates into a pretty
     // great circle using the Arc.js plugin, as included above.
-    var generator = new arc.GreatCircle(
-            obj(pairs[i][0]),
-            obj(pairs[i][1]));
+    var generator = new arc.GreatCircle(p1,p2);
     var line = generator.Arc(100, { offset: 10 });
     // Leaflet expects [lat,lng] arrays, but a lot of
     // software does the opposite, including arc.js, so
@@ -114,7 +187,7 @@ for (var i = 0; i < pairs.length; i++) {
             // the animation.
             path.style.strokeDashoffset = 0;
         };
-    })(newLine._path), i * 100);
+    })(newLine._path), animationOffset * 100);
 }
 </script>
 </body>
