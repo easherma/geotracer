@@ -24,3 +24,29 @@ Technology as a tool, diversity
 Context:
 Refugee law was written for European displaced persons, have been ammended over time
 Migration and Renewal complexities and hardships of migration
+
+Setup:  
+- Getting API Keys: (Hopefully by Tuesday we'll have a shared account.)  
+    - Sign up for free API keys for Mapzen Search and CartoDb.  
+- Setting up the website:  
+    - Edit flight_paths.html. Paste in the key where it says <ADD KEY HERE>.  
+    - Start up a local web server:  
+        - This only involves running one command if you have python installed.  
+        - For Windows, in the command prompt, enter C:\Python.exe -m SimpleHTTPServer 8000  
+        - For Mac/Linux, in the terminal, enter python -m SimpleHTTPServer 8000  
+          (If you have Python 3, the command is python -m http.server 8000)  
+- Setting up the CartoDb database:  
+    - Create a table according to this schema:  
+      CREATE TABLE geopaths   
+        (cartodb\_id number,   
+         the\_geom geometry,  
+         email string,  
+         lastedited date,  
+         p1 geometry,  
+         p2 geometry,  
+         p3 geometry,  
+         p4 geometry,  
+         p5 geometry);  
+    - Add the non-geometry columns using the CartoDb GUI. To add the point columns, enter PostGIS statements of this form into the CartoDb SQL editor:  
+      SELECT AddGeometryColumn ('geopaths','p1',4326,'POINT',2);  
+    - It is not necessary to seed the table with testing data, the webiste will do this automatically if the table is empty.
