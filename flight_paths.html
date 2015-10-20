@@ -69,7 +69,7 @@ map.doubleClickZoom.disable();
 map.scrollWheelZoom.disable();
 if (map.tap) map.tap.disable();
 
-L.control.geocoder('<ADD MAPZEN SEARCH API KEY HERE', {
+L.control.geocoder('search-daf-vyw', {
   position: 'topright'
 }).addTo(map);
 
@@ -81,8 +81,8 @@ function geoJSONToXY(ptStr) {
 }
 
 var sql = new cartodb.SQL({ 
-  user : '<ADD CARTODB USERNAME HERE>',
-  api_key : 'ADD CARTODB API KEY HERE>'
+  user : 'geotrails',
+  api_key : '944ec72c2326e3bd2a5f297f1bec4b8e7a412ab0'
 });
 
 
