@@ -50,7 +50,7 @@
 // the effect produced. That said, the same trick means that the
 // animation is non-geographical - lines interpolate in the same
 // amount of time regardless of trip length.
-
+var coord_array = [];
 // Show the whole world in this first view.
 map = L.map('map')
     .setView([20, 0], 2);
@@ -80,7 +80,7 @@ function geoJSONToXY(ptStr) {
   return {y: p.coordinates[0], x: p.coordinates[1]};
 }
 
-var sql = new cartodb.SQL({ 
+var sql = new cartodb.SQL({
   user : 'geotrails',
   api_key : '944ec72c2326e3bd2a5f297f1bec4b8e7a412ab0'
 });
@@ -123,21 +123,21 @@ sql.execute(selectAllQuery)
   })
 
 
-// For development purposes, populate table 
+// For development purposes, populate table
 //  with a handful of points from flights.js
 function populateDB(){
   // Make PostGIS points from array of pairs of points
   // of the form: [[pt_A,pt_B],[pt_C,pt_D]]
   for (var i = 0; i < 50 && i < pairs.length; i++){
     // Define column values for insert
-    var p1 = "(SELECT ST_SetSRID(ST_MakePoint(" + 
+    var p1 = "(SELECT ST_SetSRID(ST_MakePoint(" +
                 pairs[i][0][0] + "," +
                 pairs[i][0][1] + "),4326))";
-    var p2 = "(SELECT ST_SetSRID(ST_MakePoint(" + 
+    var p2 = "(SELECT ST_SetSRID(ST_MakePoint(" +
                 pairs[i][1][0] + "," +
                 pairs[i][1][1] + "),4326))";
     var lastEdited = "to_timestamp(" + Date.now() + ")";
-    
+
     //Insert new row into CartoDB
     var q = "INSERT INTO geopaths " +
             "  (lastedited,p1,p2) " +

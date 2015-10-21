@@ -282,6 +282,22 @@
       this.removeMarkers();
 
       var geo = [coords[1], coords[0]];
+      /* BEGIN EDITS OF PELIAS */
+      coord_array.push([coords[0], coords[1]]);
+      var sql = new cartodb.SQL({
+        user : 'geotrails',
+        api_key : '944ec72c2326e3bd2a5f297f1bec4b8e7a412ab0'
+      });
+
+      var insert_query = "INSERT INTO geopaths (the_geom) VALUES (ST_SetSRID(ST_Point(" + coords[0].toString() + ", " + coords[1].toString() + "),4326))";
+      sql.execute(insert_query)
+        .done(console.log("success!"))
+        .error(function(errors) {
+          // errors contains a list of errors
+          console.log("errors:" + errors);
+        });
+      console.log(coord_array);
+      /* END EDITS OF PELIAS */
       this._map.setView(geo, this._map.getZoom() || 8);
 
       var markerOptions = (typeof this.options.markers === 'object') ? this.options.markers : {};
