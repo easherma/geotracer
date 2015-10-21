@@ -35,6 +35,11 @@ function geoJSONToXY(ptStr) {
 
 // REMOVED KEYS
 // REMOVED LOADING FROM CARTODB DIRECTLY TO AVOID HAVING KEYS ON FRONT END
+geoj.rows.forEach(function(row,i){
+  if(row.p1 != null && row.p2 != null){
+    plotArc(geoJSONToXY(row.p1),geoJSONToXY(row.p2),i);
+  }
+});
 
 function plotArc(p1,p2,animationOffset){
     // Transform pair of coordinates into a pretty

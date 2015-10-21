@@ -5,6 +5,9 @@
     <div id='map' class='dark'></div>
     <br>
     <button id="submit_button">Submit</button>
+    <script>
+      var geoj = {{ carto_geoj|tojson }};
+    </script>
     <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
 
 {% endblock %}
