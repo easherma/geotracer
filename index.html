@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset=utf-8 />
-<title>Animating flight paths</title>
+<title>Mapping Immigration Stories</title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src='https://api.mapbox.com/mapbox.js/v2.2.2/mapbox.js'></script>
@@ -20,10 +20,6 @@
 <body>
 <!-- We use arc.js to make our paths curved. -->
 <script src='https://api.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
-<!-- This is our data file - it's an array of [[lat,lng],[lat,lng]] pairs
-     that define starting and ending locations of flight paths -->
-<script src='flights.js'></script>
-
 <style>
 /*
  * The path-start class is added to each line
@@ -41,7 +37,6 @@
 
 <div id='map' class='dark'></div>
 <br>
-<input type="text" id="pelias" style="margin: 20px; width: 300px">
 
 <script>
 // This is an advanced example that is compatible with
@@ -54,11 +49,7 @@
 // Show the whole world in this first view.
 map = L.map('map')
     .setView([20, 0], 2);
-//var map = L.map('map').setView([40.7259, -73.9805], 12);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-var credits = L.control.attribution({
-  prefix: '<a href="http://openflights.org/data.html">Flight data from Open Flights, under the ODbL license</a>'
-}).addTo(map);
 // Disable drag and zoom handlers.
 // Making this effect work with zooming and panning
 // would require a different technique with different
@@ -69,7 +60,7 @@ map.doubleClickZoom.disable();
 map.scrollWheelZoom.disable();
 if (map.tap) map.tap.disable();
 
-L.control.geocoder('<ADD MAPZEN SEARCH API KEY HERE', {
+L.control.geocoder('search-fZzBAcA', {
   position: 'topright'
 }).addTo(map);
 
@@ -81,25 +72,8 @@ function geoJSONToXY(ptStr) {
 }
 
 var sql = new cartodb.SQL({ 
-  user : '<ADD CARTODB USERNAME HERE>',
-  api_key : 'ADD CARTODB API KEY HERE>'
+  user : 'geotrails',
 });
-
-
-// For development purposes, populate database, if empty
-var checkEmptyQuery = "SELECT count(*) FROM geopaths;";
-sql.execute(checkEmptyQuery)
-  .done(function(data){
-    if (data.rows[0].count === 0) {
-      populateDB()
-      var msg = "CartoDB table has been seeded with testing data." +
-                " Refresh page after 2 sec for updated map.";
-      setTimeout(function(){ alert(msg); }, 3000);
-    }
-  })
-  .error(function(err){
-    console.log('error: ' + err);
-  })
 
 // Load all paths from CartoDB and start plotting
 var selectAllQuery = "SELECT cartodb_id," +
@@ -121,39 +95,6 @@ sql.execute(selectAllQuery)
     // errors contains a list of errors
     console.log("errors:" + errors);
   })
-
-
-// For development purposes, populate table 
-//  with a handful of points from flights.js
-function populateDB(){
-  // Make PostGIS points from array of pairs of points
-  // of the form: [[pt_A,pt_B],[pt_C,pt_D]]
-  for (var i = 0; i < 50 && i < pairs.length; i++){
-    // Define column values for insert
-    var p1 = "(SELECT ST_SetSRID(ST_MakePoint(" + 
-                pairs[i][0][0] + "," +
-                pairs[i][0][1] + "),4326))";
-    var p2 = "(SELECT ST_SetSRID(ST_MakePoint(" + 
-                pairs[i][1][0] + "," +
-                pairs[i][1][1] + "),4326))";
-    var lastEdited = "to_timestamp(" + Date.now() + ")";
-    
-    //Insert new row into CartoDB
-    var q = "INSERT INTO geopaths " +
-            "  (lastedited,p1,p2) " +
-            "VALUES ({{lastEdited}},{{p1}},{{p2}});";
-    var args = {
-      'p1' : p1,
-      'p2' : p2,
-      'lastEdited' : lastEdited
-    };
-
-    sql.execute(q,args)
-      .error(function(err){
-        console.log('errors: ' + err);
-      })
-  }
-}
 
 function plotArc(p1,p2,animationOffset){
     // Transform pair of coordinates into a pretty
@@ -180,7 +121,7 @@ function plotArc(p1,p2,animationOffset){
     newLine._path.style.strokeDasharray = totalLength;
     // Offset the timeout here: setTimeout makes a function
     // run after a certain number of milliseconds - in this
-    // case we want each flight path to be staggered a bit.
+    // case we want each arc to be staggered a bit.
     setTimeout((function(path) {
         return function() {
             // setting the strokeDashoffset to 0 triggers
