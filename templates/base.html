@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% block head %}
+  <meta charset=utf-8 />
+  <title>Geopaths Demo</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src='https://api.mapbox.com/mapbox.js/v2.2.2/mapbox.js'></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pelias-leaflet-geocoder.css') }}">
+  <script src="{{ url_for('static', filename='js/pelias-leaflet-geocoder.js') }}"></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/arc.js/v0.1.0/arc.js'></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% endblock %}
+</head>
+  <body>
+    {% block content %}{% endblock %}
+  </body>
+</html>
