@@ -284,8 +284,6 @@
       var geo = [coords[1], coords[0]];
       /* BEGIN EDITS OF PELIAS */
       coord_array.push([coords[0], coords[1]]);
-      console.log("Pushed " + coords[0] + ", " + coords[1] + " to the array");
-      console.log(coord_array);
       /* END EDITS OF PELIAS */
       this._map.setView(geo, this._map.getZoom() || 8);
 

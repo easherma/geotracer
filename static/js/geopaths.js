@@ -30,7 +30,7 @@ L.control.geocoder('search-daf-vyw', {
 // into the {x,y} expected by arc.js.
 function geoJSONToXY(ptStr) {
   var p = JSON.parse(ptStr);
-  return {y: p.coordinates[0], x: p.coordinates[1]};
+  return {y: p.coordinates[1], x: p.coordinates[0]};
 }
 
 // REMOVED KEYS
@@ -46,15 +46,14 @@ function plotArc(p1,p2,animationOffset){
     // great circle using the Arc.js plugin, as included above.
     var generator = new arc.GreatCircle(p1,p2);
     var line = generator.Arc(100, { offset: 10 });
-    // Leaflet expects [lat,lng] arrays, but a lot of
-    // software does the opposite, including arc.js, so
-    // we flip here.
+    var colors = ["#b2182b", "#2166ac", "#762a83", "#1a9850", "#5ab4ac", "#fee08b"];
+    var selected_color = colors[Math.floor(Math.random() * 6)];
     var newLine = L.polyline(line.geometries[0].coords.map(function(c) {
         return c.reverse();
     }), {
-        color: 'red',
-        weight: 1,
-        opacity: 0.5
+        color: selected_color,
+        weight: 1.5,
+        opacity: 0.75
     })
     .addTo(map);
     var totalLength = newLine._path.getTotalLength();
@@ -77,18 +76,30 @@ function plotArc(p1,p2,animationOffset){
 };
 
 function post_array() {
-  $.ajax({
-     type : "POST",
-     url : "/geo",
-     data: JSON.stringify(coord_array),
-     contentType: 'application/json',
-     success: function(result) {
-       console.log("success");
-     },
-     error: function (error) {
-       console.log("error: " + eval(error));
-     }
-   });
+  if (coord_array.length >= 2) {
+    $.ajax({
+       type : "POST",
+       url : "/geo",
+       data: JSON.stringify(coord_array),
+       contentType: 'application/json',
+       success: function(result) {
+         console.log("success");
+         for (var i = 1; i < coord_array.length; ++i) {
+           var p1 = {y: coord_array[i - 1][1], x: coord_array[i - 1][0]};
+           var p2 = {y: coord_array[i][1], x: coord_array[i][0]};
+           plotArc(p1, p2, i);
+         }
+         coord_array.length = 0;
+         document.getElementById("array-warn").innerText = "";
+       },
+       error: function (error) {
+         console.log("error: " + eval(error));
+       }
+     });
+  }
+  else {
+    document.getElementById("array-warn").innerText = "Please select at least two points before submitting";
+  }
 };
 
 document.getElementById("submit_button").addEventListener("click", post_array);
