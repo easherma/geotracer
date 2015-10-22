@@ -1,19 +1,31 @@
 # geopaths
 A simple project to connect the geographic dots.
 
-Instructions to get running:
+**Instructions to get running:**
 
-git clone the repo
-Install virtualenvwrapper, run mkvirtualenv geopaths --no-site-packages
-Run: workon geopaths
-Run: pip install requirements.txt
-Run: python run.py
+Clone the repo in a local directory
+
+Create a file named keys.py in the format
+
+```python
+cartodb_user = {INSERT USERNAME}
+cartodb_key = {INSERT CARTODB API KEY}
+```
+
+**Run the following commands:**
+
+```
+cd geopaths
+pip install requirements.txt
+python run.py
+```
+
 Navigate to localhost:5000 in your browser and it should be running
 
-MVP:
+**MVP:**
 Have a user enter at least two locations. These locations are geocoded, stored, and displayed on a map. Lines are drawn connecting the points.
 
-Platform:
+**Platform:**
 
 We'll likely use CartoDB as backend and Mapzen Search for geocoding. JS for frontend, with Leaflet and D3, if needed.
 
