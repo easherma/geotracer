@@ -1,12 +1,34 @@
-# geotrails
-A simple project to connect the geographic dots. 
+# geopaths
+A simple project to connect the geographic dots.
 
-MVP: 
+**Instructions to get running:**
+
+Clone the repo in a local directory
+
+Create a file named keys.py in the format
+
+```python
+cartodb_user = {INSERT USERNAME}
+cartodb_key = {INSERT CARTODB API KEY}
+```
+
+**Run the following commands:**
+
+```
+cd geopaths
+pip install requirements.txt
+python run.py
+```
+
+Navigate to localhost:5000 in your browser and it should be running
+
+**MVP:**
 Have a user enter at least two locations. These locations are geocoded, stored, and displayed on a map. Lines are drawn connecting the points.
 
-Platform:
+**Platform:**
 
-We'll likely use CartoDB as backend and Mapzen Search for geocoding. JS for frontend, with Leaflet and D3, if needed. 
+We'll likely use CartoDB as backend and Mapzen Search for geocoding. JS for frontend, with Leaflet and D3, if needed.
+
 
 Initial Inspiration:
 http://www.pewhispanic.org/2015/09/28/from-ireland-to-germany-to-italy-to-mexico-how-americas-source-of-immigrants-has-changed-in-the-states-1850-to-2013/
