@@ -43,14 +43,20 @@ geoj.rows.forEach(function(row,i){
   }
 });
 
+//Gets new rows from the server and plots them.
+//update_map executes periodically and indefinitely until server returns error
+// It is also asynchronous, so control moves past this line
+update_map();
 
-
-(function update_map() {
+//Gets new rows from the server and plots them.
+// Executes periodically and indefinitely until server returns an error.
+// Operates asynchronously, so control flow is not tied up in this func.
+function update_map() {
   $.ajax({
     type : "GET",
     url : "/more",
     data : "rowid=" + prevRowId,
-    rontentType : "text",
+    contentType : "text",
     success : function(result) {
       result.rows.forEach(function(row,i){
         if(row.p1 != null && row.p2 != null){
@@ -66,9 +72,7 @@ geoj.rows.forEach(function(row,i){
       console.log("error: " + error);
     }
   });
-}());
-
-
+};
 
 function plotArc(p1,p2,animationOffset){
     // Transform pair of coordinates into a pretty
