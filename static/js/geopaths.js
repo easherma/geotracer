@@ -5,6 +5,8 @@
 // animation is non-geographical - lines interpolate in the same
 // amount of time regardless of trip length.
 var coord_array = [];
+var UPDATE_INTERVAL = 30000; //unis of ms
+
 // Show the whole world in this first view.
 map = L.map('map')
     .setView([20, 0], 2);
@@ -40,6 +42,37 @@ geoj.rows.forEach(function(row,i){
     plotArc(geoJSONToXY(row.p1),geoJSONToXY(row.p2),i);
   }
 });
+
+//Gets new rows from the server and plots them.
+//update_map executes periodically and indefinitely until server returns error
+// It is also asynchronous, so control moves past this line
+update_map();
+
+//Gets new rows from the server and plots them.
+// Executes periodically and indefinitely until server returns an error.
+// Operates asynchronously, so control flow is not tied up in this func.
+function update_map() {
+  $.ajax({
+    type : "GET",
+    url : "/more",
+    data : "rowid=" + prevRowId,
+    contentType : "text",
+    success : function(result) {
+      result.rows.forEach(function(row,i){
+        if(row.p1 != null && row.p2 != null){
+          plotArc(geoJSONToXY(row.p1),geoJSONToXY(row.p2),i);
+        }
+        if(prevRowId < row.cartodb_id){
+          prevRowId = row.cartodb_id;
+        }
+      });
+      setTimeout(update_map,UPDATE_INTERVAL);
+    },
+    error : function(error) {
+      console.log("error: " + error);
+    }
+  });
+};
 
 function plotArc(p1,p2,animationOffset){
     // Transform pair of coordinates into a pretty

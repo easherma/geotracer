@@ -9,6 +9,7 @@
     <p id="array-warn" style="color: red;"></p>
     <script>
       var geoj = {{ carto_geoj|tojson }};
+      var prevRowId = {{ last_row_id }};
     </script>
     <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
 
