@@ -1,3 +1,3 @@
 import os
-cartodb_user = os.environ.get('cartodb_user') 
-cartodb_key = os.environ.get('cartodb_key') 
+os.environ["cartodb_user"] = 'geotrails'
+os.environ["cartodb_key"] = '944ec72c2326e3bd2a5f297f1bec4b8e7a412ab0'
