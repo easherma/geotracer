@@ -5,7 +5,6 @@ app = Flask(__name__)
 
 #enviornmentalvariablesscriptexportbeforeyourunpython
 from flask import render_template, request, redirect, url_for, jsonify
-import keys
 from cartodb import CartoDBAPIKey, CartoDBException
 import json 
 
