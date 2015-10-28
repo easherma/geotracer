@@ -8,8 +8,8 @@ Clone the repo in a local directory
 Create a file named keys.py in the format
 
 ```python
-cartodb_user = {INSERT USERNAME}
-cartodb_key = {INSERT CARTODB API KEY}
+cartodb_user = 'INSERT USERNAME'
+cartodb_key = 'INSERT CARTODB API KEY'
 ```
 
 **Run the following commands:**
