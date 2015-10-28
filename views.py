@@ -6,6 +6,7 @@ import json
 
 @app.route('/')
 def index():
+    print("HELLO FROM INDEX")
     cl = CartoDBAPIKey(keys.cartodb_key, keys.cartodb_user)
     try:
         carto_geoj = cl.sql("SELECT cartodb_id," +
