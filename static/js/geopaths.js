@@ -4,27 +4,26 @@
 // the effect produced. That said, the same trick means that the
 // animation is non-geographical - lines interpolate in the same
 // amount of time regardless of trip length.
-var coord_array = [];
+var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
 
 // Show the whole world in this first view.
-map = L.map('map')
-    .setView([20, 0], 2);
-//var map = L.map('map').setView([40.7259, -73.9805], 12);
+var map = L.map('map', {
+    bounceAtZoomLimits: true,
+	 maxBounds:
+	 [[-85.0, -180.0],
+        [85.0, 180.0]],
+    inertia: false,
+	minZoom: 2,
+	continuousWorld: false
+}).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// Disable drag and zoom handlers.
-// Making this effect work with zooming and panning
-// would require a different technique with different
-// tradeoffs.
-map.dragging.disable();
-map.touchZoom.disable();
-map.doubleClickZoom.disable();
-map.scrollWheelZoom.disable();
-if (map.tap) map.tap.disable();
+
+
 
 // LOOKS LIKE MAPZEN KEY HAS TO BE ON FRONT END
-L.control.geocoder('search-daf-vyw', {
+var geocoder =  L.control.geocoder('search-daf-vyw', {
   position: 'topright'
 }).addTo(map);
 
@@ -134,5 +133,6 @@ function post_array() {
     document.getElementById("array-warn").innerText = "Please select at least two points before submitting";
   }
 };
+
 
 document.getElementById("submit_button").addEventListener("click", post_array);
