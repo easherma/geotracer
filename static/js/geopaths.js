@@ -8,7 +8,6 @@ var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
 
 // Show the whole world in this first view.
-
 var map = L.map('map', {
     bounceAtZoomLimits: true,
 	 maxBounds:
