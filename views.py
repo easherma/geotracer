@@ -8,18 +8,12 @@ import json
 def index():
     cl = CartoDBAPIKey(keys.cartodb_key, keys.cartodb_user)
     try:
-        carto_geoj = cl.sql("SELECT cartodb_id," +
-                "ST_AsGeoJSON(p1) as p1," +
-                "ST_AsGeoJSON(p2) as p2," +
-                "ST_AsGeoJSON(p3) as p3," +
-                "ST_AsGeoJSON(p4) as p4," +
-                "ST_AsGeoJSON(p5) as p5 " +
-                "FROM geopaths;")
-        last_row_id = max([row['cartodb_id'] for row in carto_geoj['rows']])
-        print("Length of database is: ", len(carto_geoj['rows']))
+        carto_geoj_val = cl.sql("SELECT cartodb_id, ST_AsGeoJSON(p1) as p1, ST_AsGeoJSON(p2) as p2 FROM geopaths;")
+        last_row_id_val = max([row['cartodb_id'] for row in carto_geoj_val['rows']])
+        print("Length of database is: ", len(carto_geoj_val['rows']))
     except CartoDBException as e:
         print("some error ocurred", e)
-    return render_template('index.html', carto_geoj=carto_geoj, last_row_id=last_row_id)
+    return render_template('index.html', carto_geoj=carto_geoj_val,last_row_id=last_row_id_val)
 
 @app.route('/geo', methods=["POST"])
 def geodata():
@@ -40,14 +34,7 @@ def update():
     cl = CartoDBAPIKey(keys.cartodb_key, keys.cartodb_user)
     prevRow = request.args.get('rowid','')
     try:
-        carto_geoj = cl.sql("SELECT cartodb_id," +
-            "ST_AsGeoJSON(p1) as p1," +
-            "ST_AsGeoJSON(p2) as p2," +
-            "ST_AsGeoJSON(p3) as p3," +
-            "ST_AsGeoJSON(p4) as p4," +
-            "ST_AsGeoJSON(p5) as p5 " +
-            "FROM geopaths " +
-            "WHERE cartodb_id > " + str(prevRow) + ";")
+        carto_geoj_val = cl.sql("SELECT cartodb_id, ST_AsGeoJSON(p1) as p1, ST_AsGeoJSON(p2) as p2 FROM geopaths WHERE cartodb_id > " + str(prevRow) + ";")
     except CartoDBException as e:
         print("some error occurred", e)
-    return jsonify(carto_geoj)
+    return jsonify(carto_geoj_val)
