@@ -1,4 +1,4 @@
-# geopaths
+# geotracer
 A simple project to connect the geographic dots.
 
 **Instructions to get running:**
