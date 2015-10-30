@@ -26,7 +26,7 @@ def index():
 
 @app.route('/geo', methods=["POST"])
 def geodata():
-    # Query: INSERT INTO geopaths (the_geom) VALUES (ST_SetSRID(ST_Point(" + coords[0].toString() + ", " + coords[1].toString() + "),4326))
+    # Query: INSERT INTO geopaths (the_geom) VALUES (ST_SetSRID(ST_Point(" + ds[0].toString() + ", " + coords[1].toString() + "),4326))
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
     geodata = request.json
     print(geodata)
