@@ -41,13 +41,13 @@ function geoJSONToLLatLng(ptStr) {
 //rows.geomerty.coordinates 0 = long 1 = lat
 geoj.features.forEach(function(row,i){
   if(row.geometry.coordinates[0] != null && row.geometry.coordinates[1] != null){
-    var lat1 = row.geometry.coordinates[0][1]
+    /*var lat1 = row.geometry.coordinates[0][1]
     var lng1 = row.geometry.coordinates[0][0]
-    var latlng1 = [lat1, lng1]
+    var latlng1 = [row.geometry.coordinates[0][1], row.geometry.coordinates[0][0]]
     var lat2 = row.geometry.coordinates[1][1]
     var lng2 = row.geometry.coordinates[1][0]
-    var latlng2 = [lat2, lng2]
-    var latlngs = [latlng1, latlng2]
+    var latlng2 = [lat2, lng2]*/
+    var latlngs = [[row.geometry.coordinates[0][1], row.geometry.coordinates[0][0]], [row.geometry.coordinates[1][1],row.geometry.coordinates[1][0]]]
     var line = L.polyline(latlngs,{snakingSpeed: 200}); 
     strangers_layer_group.addLayer(line)
     line.addTo(map).snakeIn();
