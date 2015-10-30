@@ -6,7 +6,9 @@
 // amount of time regardless of trip length.
 var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
-
+//Create new grouping of non-user-submitted paths.
+//We will add paths to the group as they are retrieved from the db.
+var strangers_layer_group = L.layerGroup();
 // Show the whole world in this first view.
 var map = L.map('map', {
     bounceAtZoomLimits: true,
@@ -15,7 +17,8 @@ var map = L.map('map', {
         [85.0, 180.0]],
     inertia: false,
 	minZoom: 2,
-	continuousWorld: false
+	continuousWorld: false,
+	layers: [strangers_layer_group]
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 // LOOKS LIKE MAPZEN KEY HAS TO BE ON FRONT END
@@ -30,20 +33,34 @@ function geoJSONToLLatLng(ptStr) {
   return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
 
-// REMOVED KEYS
-// REMOVED LOADING FROM CARTODB DIRECTLY TO AVOID HAVING KEYS ON FRONT END
+// this loads data and does the inital animation
 geoj.rows.forEach(function(row,i){
   if(row.p1 != null && row.p2 != null){
     var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
     var line = L.polyline(latlngs,{snakingSpeed: 200}); 
-    line.addTo(map).snakeIn();
+    //add to layergroup instead of directly to map
+	strangers_layer_group.addLayer(line);
+	//line.addTo(map).snakeIn();
   }
 });
+
+//Create leaflet control to toggle map layers
+var overlayMaps = {
+  "strangers": strangers_layer_group,
+  "none" : L.layerGroup()
+};
+var overlayControl = L.control.layers(overlayMaps);
+overlayControl.options.position = 'bottomright';
+overlayControl.addTo(map);
+//Snakein on each layer animates all at once
+overlayMaps.strangers.eachLayer(function(x){x.snakeIn()});
+//Snakein on the layergroup animates one at a time
+//overlayMaps.strangers.snakeIn();
 
 //Gets new rows from the server and plots them.
 //update_map executes periodically and indefinitely until server returns error
 // It is also asynchronous, so control moves past this line
-update_map();
+//update_map();
 
 //Gets new rows from the server and plots them.
 // Executes periodically and indefinitely until server returns an error.
@@ -100,5 +117,4 @@ function post_array() {
   }
 };
 
-
-document.getElementById("submit_button").addEventListener("click", post_array);
+//document.getElementById("submit_button").addEventListener("click", post_array);
