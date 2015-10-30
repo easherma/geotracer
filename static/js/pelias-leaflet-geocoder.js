@@ -286,7 +286,7 @@
       }
     },
 
-    showMarker: function (text, coords) {
+    showMarker: function (text, coords, place) {
       this.removeMarkers();
 
       var geo = [coords[1], coords[0]];
