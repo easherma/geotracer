@@ -16,10 +16,10 @@ def index():
     print("HELLO FROM INDEX")
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
     try:
-        carto_geoj = cl.sql("SELECT cartodb_id, ST_AsGeoJSON(p1) as p1, ST_AsGeoJSON(p2) as p2 FROM geopaths;")
-        last_row_id = max([row['cartodb_id'] for row in carto_geoj['rows']])
+        carto_geoj = json.dumps(cl.sql("SELECT cartodb_id, ST_COLLECT((ST_SETSRID(p1,4326)), (ST_SETSRID(p2,4326))) AS the_geom FROM geopaths", format='geojson'))
+        last_row_id = 0
         print(carto_geoj)
-        print("Length of database is: ", len(carto_geoj['rows']))
+        #print("Length of database is: ", len(carto_geoj['rows']))
     except CartoDBException as e:
         print("some error ocurred", e)
     return render_template('index.html', carto_geoj=carto_geoj, last_row_id=last_row_id)

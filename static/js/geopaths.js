@@ -32,14 +32,28 @@ function geoJSONToLLatLng(ptStr) {
 
 // REMOVED KEYS
 // REMOVED LOADING FROM CARTODB DIRECTLY TO AVOID HAVING KEYS ON FRONT END
+/*geoj.rows.forEach(function(row,i){
+  if(row.p1 != null && row.p2 != null){
+    var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
+    var line = L.polyline(latlngs,{snakingSpeed: 200}); 
+    line.addTo(map).snakeIn();
+  }
+})*/
+
+
+
+var geojsonFeature = geoj
+L.geoJson(geojsonFeature).addTo(map);
+
 geoj.rows.forEach(function(row,i){
   if(row.p1 != null && row.p2 != null){
     var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
     var line = L.polyline(latlngs,{snakingSpeed: 200}); 
     line.addTo(map).snakeIn();
   }
-});
+})
 
+geojsonFeature.addTo(map).snakeIn();
 //Gets new rows from the server and plots them.
 //update_map executes periodically and indefinitely until server returns error
 // It is also asynchronous, so control moves past this line
