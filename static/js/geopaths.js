@@ -3,7 +3,6 @@
 // Declare global variables
 var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
-
 var geocoderResults;
 //marker array
 //Create new grouping of non-user-submitted paths.
@@ -22,7 +21,9 @@ var map = L.map('map', {
 	layers: [strangers_layer_group]
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
 // LOOKS LIKE MAPZEN KEY HAS TO BE ON FRONT END
+// options for pelias geocoder
 var options =
 {
   position: 'topright'
@@ -36,19 +37,27 @@ function geoJSONToLLatLng(ptStr) {
   return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
 
-// REMOVED KEYS
-// REMOVED LOADING FROM CARTODB DIRECTLY TO AVOID HAVING KEYS ON FRONT END
-/*geoj.rows.forEach(function(row,i){
-  if(row.p1 != null && row.p2 != null){
-    var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
+// this loads data and does the inital animation
+//rows.geomerty.coordinates 0 = long 1 = lat
+geoj.features.forEach(function(row,i){
+  if(row.geometry.coordinates[0] != null && row.geometry.coordinates[1] != null){
+    var lat1 = row.geometry.coordinates[0][1]
+    var lng1 = row.geometry.coordinates[0][0]
+    var latlng1 = [lat1, lng1]
+    var lat2 = row.geometry.coordinates[1][1]
+    var lng2 = row.geometry.coordinates[1][0]
+    var latlng2 = [lat2, lng2]
+    var latlngs = [latlng1, latlng2]
     var line = L.polyline(latlngs,{snakingSpeed: 200}); 
+    strangers_layer_group.addLayer(line)
     line.addTo(map).snakeIn();
   }
-})*/
+})
 
-
+var myLayer = L.geoJson().addTo(map);
 var geojsonFeature = geoj
-L.geoJson(geojsonFeature).addTo(map);
+myLayer.addData(geojsonFeature);
+
 
 
 //Gets new rows from the server and plots them.
@@ -58,7 +67,8 @@ L.geoJson(geojsonFeature).addTo(map);
 //Create leaflet control to toggle map layers
 var overlayMaps = {
   "strangers": strangers_layer_group,
-  "none" : L.layerGroup()
+  "none" : L.layerGroup(),
+  "myLayer" : myLayer
 };
 var overlayControl = L.control.layers(overlayMaps);
 overlayControl.options.position = 'bottomright';

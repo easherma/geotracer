@@ -15,7 +15,7 @@ def index():
     print("HELLO FROM INDEX")
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
     try:
-        carto_geoj = json.dumps(cl.sql("SELECT cartodb_id, ST_COLLECT((ST_SETSRID(p1,4326)), (ST_SETSRID(p2,4326))) AS the_geom FROM geopaths", format='geojson'))
+        carto_geoj = json.dumps(cl.sql("SELECT * FROM points", format='geojson'))
         last_row_id = 0
         print(carto_geoj)
         #print("Length of database is: ", len(carto_geoj['rows']))
@@ -43,11 +43,7 @@ def update():
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
     prevRow = request.args.get('rowid','')
     try:
-        carto_geoj = cl.sql("SELECT cartodb_id," +
-            "ST_AsGeoJSON(p1) as p1," +
-            "ST_AsGeoJSON(p2) as p2," +
-            "FROM geopaths " +
-            "WHERE cartodb_id > " + str(prevRow) + ";")
+        carto_geoj = cl.sql("SELECT * FROM points")
     except CartoDBException as e:
         print("some error occurred", e)
     return jsonify(carto_geoj)
