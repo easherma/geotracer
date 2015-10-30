@@ -57,8 +57,8 @@
     <br>
     <p id="array-warn" style="color: red;"></p>
     <script>
-      var geoj = {{ carto_geoj|tojson }};
-      var prevRowId = {{ last_row_id }};
+      var geoj = {% autoescape false %}{{carto_geoj}}{% endautoescape %}
+      //var prevRowId = {{ last_row_id }};
     </script>
     <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
     </section>
@@ -95,7 +95,7 @@
                                     <strong>Where did you grow up?</strong>
                                 </h4>
                                 <p>In west Philadelphia born and raised, On the playground was where I spent most of my days.</p>
-                                <button id="submit_button">Submit</button> 
+                                <button id="submit_button2">Submit</button> 
                             </div>
                         </div>
                         <div class="col-md-2 col-sm-6">

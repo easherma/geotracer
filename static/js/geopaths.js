@@ -1,14 +1,16 @@
-// This is an advanced example that is compatible with
-// modern browsers and IE9+ - the trick it uses is animation
-// of SVG properties, which makes it relatively efficient for
-// the effect produced. That said, the same trick means that the
-// animation is non-geographical - lines interpolate in the same
-// amount of time regardless of trip length.
+
+//leaflet has layer toggles, could have one map, button toggles the main layer off, cumaltive submissions from user
+// Declare global variables
 var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
+<<<<<<< HEAD
+var geocoderResults;
+//marker array
+=======
 //Create new grouping of non-user-submitted paths.
 //We will add paths to the group as they are retrieved from the db.
 var strangers_layer_group = L.layerGroup();
+>>>>>>> origin/master
 // Show the whole world in this first view.
 var map = L.map('map', {
     bounceAtZoomLimits: true,
@@ -22,9 +24,11 @@ var map = L.map('map', {
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 // LOOKS LIKE MAPZEN KEY HAS TO BE ON FRONT END
-var geocoder =  L.control.geocoder('search-daf-vyw', {
+var options =
+{
   position: 'topright'
-}).addTo(map);
+}
+var geocoder =  L.control.geocoder('search-daf-vyw', options).addTo(map);
 
 // Transform a GeoJSON string '{type:"Point",coordinates:[x,y]}'
 // into a leaflet LatLng object
@@ -33,7 +37,25 @@ function geoJSONToLLatLng(ptStr) {
   return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
 
+<<<<<<< HEAD
+// REMOVED KEYS
+// REMOVED LOADING FROM CARTODB DIRECTLY TO AVOID HAVING KEYS ON FRONT END
+/*geoj.rows.forEach(function(row,i){
+  if(row.p1 != null && row.p2 != null){
+    var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
+    var line = L.polyline(latlngs,{snakingSpeed: 200}); 
+    line.addTo(map).snakeIn();
+  }
+})*/
+
+
+
+var geojsonFeature = geoj
+L.geoJson(geojsonFeature).addTo(map);
+
+=======
 // this loads data and does the inital animation
+>>>>>>> origin/master
 geoj.rows.forEach(function(row,i){
   if(row.p1 != null && row.p2 != null){
     var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
@@ -42,8 +64,15 @@ geoj.rows.forEach(function(row,i){
 	strangers_layer_group.addLayer(line);
 	//line.addTo(map).snakeIn();
   }
-});
+})
 
+<<<<<<< HEAD
+geojsonFeature.addTo(map).snakeIn();
+//Gets new rows from the server and plots them.
+//update_map executes periodically and indefinitely until server returns error
+// It is also asynchronous, so control moves past this line
+//comment this for debugging
+=======
 //Create leaflet control to toggle map layers
 var overlayMaps = {
   "strangers": strangers_layer_group,
@@ -60,6 +89,7 @@ overlayMaps.strangers.eachLayer(function(x){x.snakeIn()});
 //Gets new rows from the server and plots them.
 //update_map executes periodically and indefinitely until server returns error
 // It is also asynchronous, so control moves past this line
+>>>>>>> origin/master
 //update_map();
 
 //Gets new rows from the server and plots them.
@@ -90,16 +120,30 @@ function update_map() {
   });
 }
 
+function addMarkerToArray(coordPair) {
+    coord_array.push(coordPair);
+}
+
 function post_array() {
-  if (coord_array.length >= 2) {
+  if (geocoder.markers.length >= 2) {
+      
+        // take each marker from the geocoder layer and map it to a new array
+        var data = [];
+        $.each(geocoder.markers, function(i, v) { 
+            latlng = v.getLatLng();
+            latitude = latlng.lat;
+            longitude = latlng.lng;
+            data.push([lng, lat]);
+        });
+      
     $.ajax({
        type : "POST",
        url : "/geo",
-       data: JSON.stringify(coord_array),
+       data: JSON.stringify(geocoder.markers),
        contentType: 'application/json',
        success: function(result) {
          console.log("success");
-         var latlngs = coord_array.map(function(d){
+         var latlngs = data.map(function(d){
            return new L.LatLng(d[1],d[0]);
          });
          var line = L.polyline(latlngs, {snakingSpeed: 200});
@@ -117,4 +161,8 @@ function post_array() {
   }
 };
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/master
 //document.getElementById("submit_button").addEventListener("click", post_array);

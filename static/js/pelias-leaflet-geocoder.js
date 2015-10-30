@@ -197,6 +197,7 @@
           if (this.maxReqTimestampRendered < reqStartedAt) {
             this.maxReqTimestampRendered = reqStartedAt;
             this.showResults(results.features);
+            geocoderResults = results.features;
           }
           // Else ignore the request, it is stale.
         }
@@ -245,6 +246,13 @@
 
         resultItem.layer = feature.properties.layer;
         resultItem.coords = feature.geometry.coordinates;
+        
+        /* Let's also take the name of the Place that's returned by Pelias so we can use
+        * it later and store it in CartoDB as a human-readable Place name
+        */
+        resultItem['place'] = {};
+        resultItem['place'].name = feature.properties.name;
+        resultItem['place'].country = feature.properties.country;
 
         // Point or polygon icon
         var layerIconContainer = L.DomUtil.create('span', 'leaflet-pelias-layer-icon-container', resultItem);
@@ -278,19 +286,19 @@
       }
     },
 
-    showMarker: function (text, coords) {
+    showMarker: function (text, coords, place) {
       this.removeMarkers();
 
       var geo = [coords[1], coords[0]];
-      /* BEGIN EDITS OF PELIAS */
-      coord_array.push([coords[0], coords[1]]);
-      /* END EDITS OF PELIAS */
       this._map.setView(geo, this._map.getZoom() || 8);
 
       var markerOptions = (typeof this.options.markers === 'object') ? this.options.markers : {};
 
       if (this.options.markers) {
-        this.marker = new L.marker(geo, markerOptions).bindPopup(text); // eslint-disable-line new-cap
+        this.marker = new L.marker(geo, markerOptions).bindPopup(text + "<br /><a class='btn btn-default'>Confirm</a>"); // eslint-disable-line new-cap
+        this.marker.location_text = place.name;
+        this.marker.on('click',function(){addMarkerToArray(geo);});
+        this.marker.country = place.country;
         this._map.addLayer(this.marker);
         this.markers.push(this.marker);
         this.marker.openPopup();
@@ -455,7 +463,8 @@
           var panToPoint = function (shouldPan) {
             var _selected = self._results.querySelectorAll('.leaflet-pelias-selected')[0];
             if (_selected && shouldPan) {
-              self.showMarker(_selected.innerHTML, _selected['coords']);
+                console.log(_selected);
+              self.showMarker(_selected.innerHTML, _selected['coords'], _selected['place']);
             }
           };
 
@@ -472,7 +481,7 @@
             case 13:
               if (selected) {
                 this.setSelectedResult();
-                this.showMarker(selected.innerHTML, selected['coords']);
+                this.showMarker(selected.innerHTML, selected['coords'], selected['place']);
                 this.clear();
               } else {
                 // perform a full text search on enter
@@ -608,7 +617,7 @@
           if (selected) {
             L.DomUtil.addClass(selected, 'leaflet-pelias-selected');
             this.setSelectedResult();
-            this.showMarker(selected.innerHTML, selected['coords']);
+            this.showMarker(selected.innerHTML, selected['coords'], selected['place']);
             this.clear();
           }
         }, this)
