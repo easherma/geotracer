@@ -6,45 +6,49 @@ var UPDATE_INTERVAL = 30000; //unis of ms
 
 //Create new grouping of non-user-submitted paths.
 //We will add paths to the group as they are retrieved from the db.
-var strangers_layer_group = L.layerGroup();
+var strangers_layer_group = L.featureGroup();
 
 // Show the whole world in this first view.
 var map = L.map('map', {
   bounceAtZoomLimits: true,
   maxBounds: [[-85.0, -180.0],[85.0, 180.0]],
   inertia: false,
-	minZoom: 2,
-	continuousWorld: false,
-	layers: [strangers_layer_group]
+  minZoom: 2,
+  continuousWorld: false,
+  layers: [strangers_layer_group] //layers added here are shown by default
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 var geocoder_options = {position: 'topright'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
-
-// TODO: Choose: Add geojson straight to map or to layercontrol
-var geojsonFeature = geoj
-L.geoJson(geojsonFeature).addTo(map);
-geojsonFeature.addTo(map).snakeIn();
-
 // this loads data and does the inital animation
-geoj.rows.forEach(function(row,i){
-  if(row.p1 != null && row.p2 != null){
-    var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
-    var line = L.polyline(latlngs,{snakingSpeed: 200}); 
-    //add to layergroup instead of directly to map
-	  strangers_layer_group.addLayer(line);
-	  //line.addTo(map).snakeIn();
+geoj.features.forEach(function(feat){
+  // Assume each feature is a Multipoint geometry
+  // (which is ordered Long,Lat. Leaflet expects Lat,Long
+  var coords = feat.geometry.coordinates.map(function(p){return p.reverse();});
+
+  // Create layer group for each route.
+  var route = L.featureGroup([L.marker(coords[0])]);
+  for (var i = 1; i < coords.length; i ++){
+    route.addLayer(L.polyline([coords[i-1],coords[i]]));
+    route.addLayer(L.marker(coords[i]));
   }
-})
+  
+  //Add route layer group to grouping of all non-user routes
+  strangers_layer_group.addLayer(route);
+});
+
+/* Alternatively, add geoJson straight to group.
+ * strangers_layer_group.addLayer(L.geoJson(geoj));
+ */
 
 //Create leaflet control to toggle map layers
-var overlayMaps = {
+var baseMaps = {
   "strangers": strangers_layer_group,
   "none" : L.layerGroup()
 };
-var overlayControl = L.control.layers(overlayMaps);
+var overlayControl = L.control.layers(baseMaps);
 overlayControl.options.position = 'bottomright';
 overlayControl.addTo(map);
 //Snakein on each layer animates all at once
