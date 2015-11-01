@@ -32,10 +32,9 @@ def geodata():
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
     geodata = request.json
     print(user_data)
-    for index in range(1, len(geodata)):
-        try:
+    try:
             cl.sql("CREATE TABLE temp AS WITH data AS (SELECT" + geodata + "::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f;"
-        except CartoDBException as e:
+    except CartoDBException as e:
             print("some error ocurred", e)
     return redirect(url_for('index'))
 
