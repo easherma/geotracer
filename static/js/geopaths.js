@@ -60,7 +60,7 @@ var baseMaps = {
   "none" : L.layerGroup()
 };
 var overlayMaps = {
-  "user": confirmed_pts
+  "confirmed": confirmed_pts
 };
 var overlayControl = L.control.layers(baseMaps,overlayMaps);
 overlayControl.options.position = 'bottomright';
@@ -112,12 +112,41 @@ function update_map() {
   });
 }
 
+//Handle user clicking 'Confirm' button.
 function confirmCoord(coordPair) {
-    confirmed_pts.addLayer(L.marker(coordPair));
+  
+    //Show confirmation
+    var confirmation_msg = document.createElement('div');
+    confirmation_msg.innerHTML = "Point Added. <br />";
+    var confirmed_mark = L.marker(coordPair).bindPopup(confirmation_msg);
+    confirmed_pts.addLayer(confirmed_mark);
+
+    if (allowSubmit()){
+      addSubmitBtn(confirmed_mark);
+    }
+
+    confirmed_mark.openPopup();
+}
+
+function addSubmitBtn(confirmed_mark){
+  var submitBtn = document.createElement('a');
+  submitBtn.className = "btn btn-default";
+  submitBtn.innerHTML = "Submit";
+  submitBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    map.closePopup();
+    post_array();
+  });
+  confirmed_mark.getPopup().getContent().appendChild(submitBtn);
+}
+
+function allowSubmit(){
+  return confirmed_pts.getLayers().length >= 2;
 }
 
 function post_array() {
-  if (geocoder.markers.length >= 2) {
+  alert('posted but not really');
+  /*if (geocoder.markers.length >= 2) {
       
         // take each marker from the geocoder layer and map it to a new array
         var data = [];
@@ -151,5 +180,6 @@ function post_array() {
   else {
     document.getElementById("array-warn").innerText = "Please select at least two points before submitting";
   }
+  */
 };
 

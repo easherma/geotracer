@@ -298,7 +298,11 @@
         var confirmBtn = document.createElement("a");
         confirmBtn.className = "btn btn-default";
         confirmBtn.innerHTML = "Confirm";
-        confirmBtn.addEventListener('click',function(){confirmCoord(geo);});
+        confirmBtn.addEventListener('click',function(){
+          // Prevent doubletap
+          map.closePopup();
+          confirmCoord(geo);
+        });
         var popupContent = document.createElement("div");
         popupContent.innerHTML = text + "<br />";
         popupContent.appendChild(confirmBtn);
