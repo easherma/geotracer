@@ -3,6 +3,7 @@
 // Declare global variables
 var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
+var geocoderResults; //Referenced in Pelias js 
 
 //Create new grouping of non-user-submitted paths.
 //We will add paths to the group as they are retrieved from the db.
