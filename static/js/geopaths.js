@@ -1,9 +1,12 @@
 /* ************ MAIN ************ */
 
 // Declare global variables
-var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
 var geocoderResults; //Referenced in Pelias js 
+
+//Create grouping for user-submitted results.
+//We will add points to the group as they are geocoded & confirmed by user.
+var confirmed_pts = L.layerGroup();
 
 //Create new grouping of non-user-submitted paths.
 //We will add paths to the group as they are retrieved from the db.
@@ -16,7 +19,7 @@ var map = L.map('map', {
   inertia: false,
   minZoom: 2,
   continuousWorld: false,
-  layers: [strangers_layer_group] //layers added here are shown by default
+  layers: [confirmed_pts,strangers_layer_group] //layers added here are shown by default
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -56,7 +59,10 @@ var baseMaps = {
   "strangers": strangers_layer_group,
   "none" : L.layerGroup()
 };
-var overlayControl = L.control.layers(baseMaps);
+var overlayMaps = {
+  "user": confirmed_pts
+};
+var overlayControl = L.control.layers(baseMaps,overlayMaps);
 overlayControl.options.position = 'bottomright';
 overlayControl.addTo(map);
 
@@ -107,7 +113,7 @@ function update_map() {
 }
 
 function confirmCoord(coordPair) {
-    coord_array.push(coordPair);
+    confirmed_pts.addLayer(L.marker(coordPair));
 }
 
 function post_array() {
