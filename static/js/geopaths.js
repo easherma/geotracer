@@ -4,11 +4,13 @@
 var UPDATE_INTERVAL = 30000; //unis of ms
 var geocoderResults; //Referenced in Pelias js 
 
-//Create grouping for user-submitted results.
-//We will add points to the group as they are geocoded & confirmed by user.
+//Create groupings for user-submitted results.
+//We will add points to this group as they are geocoded & confirmed by user.
 var confirmed_pts = L.layerGroup();
+//We will add points to this group as they are submitted.
+var user_layer_group = L.layerGroup();
 
-//Create new grouping of non-user-submitted paths.
+//Create grouping of non-user-submitted paths.
 //We will add paths to the group as they are retrieved from the db.
 var strangers_layer_group = L.featureGroup();
 
@@ -19,7 +21,7 @@ var map = L.map('map', {
   inertia: false,
   minZoom: 2,
   continuousWorld: false,
-  layers: [confirmed_pts,strangers_layer_group] //layers added here are shown by default
+  layers: [confirmed_pts,user_layer_group,strangers_layer_group] //layers added here are shown by default
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -60,7 +62,8 @@ var baseMaps = {
   "none" : L.layerGroup()
 };
 var overlayMaps = {
-  "confirmed": confirmed_pts
+  "confirmed": confirmed_pts,
+  "submitted": user_layer_group
 };
 var overlayControl = L.control.layers(baseMaps,overlayMaps);
 overlayControl.options.position = 'bottomright';
@@ -135,7 +138,7 @@ function addSubmitBtn(confirmed_mark){
   submitBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
-    post_array();
+    submit();
   });
   confirmed_mark.getPopup().getContent().appendChild(submitBtn);
 }
@@ -144,42 +147,41 @@ function allowSubmit(){
   return confirmed_pts.getLayers().length >= 2;
 }
 
+function submit(){  
+  // Collect points into path and animate
+  var latlngs = confirmed_pts.getLayers().map(function(d){return d.getLatLng();});
+  var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
+  user_layer_group.addLayer(confirmed_poly);
+  confirmed_poly.snakeIn();
+
+  // Transfer markers to submitted group
+  // Redraw submitted markers to keep them visible after clearing confirmed pts
+  var tmp_markers = confirmed_pts.getLayers();
+  confirmed_pts.clearLayers();
+  tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+
+  post_array();
+}
+
 function post_array() {
-  alert('posted but not really');
-  /*if (geocoder.markers.length >= 2) {
       
-        // take each marker from the geocoder layer and map it to a new array
-        var data = [];
-        $.each(geocoder.markers, function(i, v) { 
-            latlng = v.getLatLng();
-            latitude = latlng.lat;
-            longitude = latlng.lng;
-            data.push([lng, lat]);
-        });
-      
-    $.ajax({
-       type : "POST",
-       url : "/geo",
-       data: JSON.stringify(geocoder.markers),
-       contentType: 'application/json',
-       success: function(result) {
-         console.log("success");
-         var latlngs = data.map(function(d){
-           return new L.LatLng(d[1],d[0]);
-         });
-         var line = L.polyline(latlngs, {snakingSpeed: 200});
-         line.addTo(map).snakeIn();
-         coord_array.length = 0;
-         document.getElementById("array-warn").innerText = "";
-       },
-       error: function (error) {
-         console.log("error: " + eval(error));
-       }
-     });
-  }
-  else {
-    document.getElementById("array-warn").innerText = "Please select at least two points before submitting";
-  }
-  */
+  // Transform markers into array of [x,y]
+  var latlngs = confirmed_pts.getLayers().map(function(d){
+   var latlng = d.getLatLng();
+   return [latlng.lng,latlng.lat];
+  });
+
+  $.ajax({
+    type : "POST",
+    url : "/geo",
+    data: JSON.stringify(latlngs),
+    contentType: 'application/json',
+    success: function(result) {
+      console.log("success");
+    },
+    error: function (error) {
+      console.log("error: " + eval(error));
+    }
+  });
 };
 
