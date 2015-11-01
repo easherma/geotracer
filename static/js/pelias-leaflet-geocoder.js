@@ -295,9 +295,19 @@
       var markerOptions = (typeof this.options.markers === 'object') ? this.options.markers : {};
 
       if (this.options.markers) {
-        this.marker = new L.marker(geo, markerOptions).bindPopup(text + "<br /><a class='btn btn-default'>Confirm</a>"); // eslint-disable-line new-cap
+        var confirmBtn = document.createElement("a");
+        confirmBtn.className = "btn btn-default";
+        confirmBtn.innerHTML = "Confirm";
+        confirmBtn.addEventListener('click',function(){
+          // Prevent doubletap
+          map.closePopup();
+          confirmCoord(geo);
+        });
+        var popupContent = document.createElement("div");
+        popupContent.innerHTML = text + "<br />";
+        popupContent.appendChild(confirmBtn);
+        this.marker = new L.marker(geo, markerOptions).bindPopup(popupContent); // eslint-disable-line new-cap
         this.marker.location_text = place.name;
-        this.marker.on('click',function(){addMarkerToArray(geo);});
         this.marker.country = place.country;
         this._map.addLayer(this.marker);
         this.markers.push(this.marker);

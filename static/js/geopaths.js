@@ -1,96 +1,91 @@
+/* ************ MAIN ************ */
 
-//leaflet has layer toggles, could have one map, button toggles the main layer off, cumaltive submissions from user
 // Declare global variables
-var coord_array = []
 var UPDATE_INTERVAL = 30000; //unis of ms
-<<<<<<< HEAD
-var geocoderResults;
-//marker array
-=======
-//Create new grouping of non-user-submitted paths.
+var geocoderResults; //Referenced in Pelias js 
+
+//Create groupings for user-submitted results.
+//We will add points to this group as they are geocoded & confirmed by user.
+var confirmed_pts = L.layerGroup();
+//We will add points to this group as they are submitted.
+var user_layer_group = L.layerGroup();
+
+//Create grouping of non-user-submitted paths.
 //We will add paths to the group as they are retrieved from the db.
-var strangers_layer_group = L.layerGroup();
->>>>>>> origin/master
+var strangers_layer_group = L.featureGroup();
+
 // Show the whole world in this first view.
 var map = L.map('map', {
-    bounceAtZoomLimits: true,
-	 maxBounds:
-	 [[-85.0, -180.0],
-        [85.0, 180.0]],
-    inertia: false,
-	minZoom: 2,
-	continuousWorld: false,
-	layers: [strangers_layer_group]
+  bounceAtZoomLimits: true,
+  maxBounds: [[-85.0, -180.0],[85.0, 180.0]],
+  inertia: false,
+  minZoom: 2,
+  continuousWorld: false,
+  layers: [confirmed_pts,user_layer_group,strangers_layer_group] //layers added here are shown by default
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-// LOOKS LIKE MAPZEN KEY HAS TO BE ON FRONT END
-var options =
-{
-  position: 'topright'
-}
-var geocoder =  L.control.geocoder('search-daf-vyw', options).addTo(map);
+
+var geocoder_options = {position: 'topright'};
+var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
+
+// this loads data into a leaflet layer
+geoj.features.forEach(function(feat){
+  // Assume each feature is a Multipoint geometry
+  // (which is ordered Long,Lat. Leaflet expects Lat,Long
+  var coords = feat.geometry.coordinates.map(function(p){return p.reverse();});
+  
+  // Skip route if any coordinate is null
+  if(coords.reduce(function(notNull,coord){return notNull && coord != null;},true)){
+    
+    // Create layer group for a route.
+    var route = L.featureGroup([L.marker(coords[0])]);
+    for (var i = 1; i < coords.length; i ++){
+      route.addLayer(L.polyline([coords[i-1],coords[i]]));
+      route.addLayer(L.marker(coords[i]));
+    }
+
+    //Add route layer group to grouping of all non-user routes
+    strangers_layer_group.addLayer(route);
+
+  }
+  
+});
+// Do initial animation:
+//Snakein on each layer animates all at once
+strangers_layer_group.eachLayer(function(x){x.snakeIn()});
+//Snakein on the layergroup animates one at a time
+//strangers_layer_group.snakeIn();
+
+//Create leaflet control to toggle map layers
+var baseMaps = {
+  "strangers": strangers_layer_group,
+  "none" : L.layerGroup()
+};
+var overlayMaps = {
+  "confirmed": confirmed_pts,
+  "submitted": user_layer_group
+};
+var overlayControl = L.control.layers(baseMaps,overlayMaps);
+overlayControl.options.position = 'bottomright';
+overlayControl.addTo(map);
+
+//Gets new rows from the server and plots them.
+//update_map executes periodically and indefinitely until server returns error
+// It is also asynchronous, so control moves past this line
+//update_map(); //commented out while backend is in flux
+
+//commented out while front end is in flux
+//document.getElementById("submit_button").addEventListener("click", post_array);
+
+
+/* ************ FUNCTIONS *********** */
 
 // Transform a GeoJSON string '{type:"Point",coordinates:[x,y]}'
-// into a leaflet LatLng object
+//  into a leaflet LatLng object  */
 function geoJSONToLLatLng(ptStr) {
   var p = JSON.parse(ptStr);
   return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
-
-<<<<<<< HEAD
-// REMOVED KEYS
-// REMOVED LOADING FROM CARTODB DIRECTLY TO AVOID HAVING KEYS ON FRONT END
-/*geoj.rows.forEach(function(row,i){
-  if(row.p1 != null && row.p2 != null){
-    var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
-    var line = L.polyline(latlngs,{snakingSpeed: 200}); 
-    line.addTo(map).snakeIn();
-  }
-})*/
-
-
-
-var geojsonFeature = geoj
-L.geoJson(geojsonFeature).addTo(map);
-
-=======
-// this loads data and does the inital animation
->>>>>>> origin/master
-geoj.rows.forEach(function(row,i){
-  if(row.p1 != null && row.p2 != null){
-    var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
-    var line = L.polyline(latlngs,{snakingSpeed: 200}); 
-    //add to layergroup instead of directly to map
-	strangers_layer_group.addLayer(line);
-	//line.addTo(map).snakeIn();
-  }
-})
-
-<<<<<<< HEAD
-geojsonFeature.addTo(map).snakeIn();
-//Gets new rows from the server and plots them.
-//update_map executes periodically and indefinitely until server returns error
-// It is also asynchronous, so control moves past this line
-//comment this for debugging
-=======
-//Create leaflet control to toggle map layers
-var overlayMaps = {
-  "strangers": strangers_layer_group,
-  "none" : L.layerGroup()
-};
-var overlayControl = L.control.layers(overlayMaps);
-overlayControl.options.position = 'bottomright';
-overlayControl.addTo(map);
-//Snakein on each layer animates all at once
-overlayMaps.strangers.eachLayer(function(x){x.snakeIn()});
-//Snakein on the layergroup animates one at a time
-//overlayMaps.strangers.snakeIn();
-
-//Gets new rows from the server and plots them.
-//update_map executes periodically and indefinitely until server returns error
-// It is also asynchronous, so control moves past this line
->>>>>>> origin/master
-//update_map();
 
 //Gets new rows from the server and plots them.
 // Executes periodically and indefinitely until server returns an error.
@@ -120,49 +115,73 @@ function update_map() {
   });
 }
 
-function addMarkerToArray(coordPair) {
-    coord_array.push(coordPair);
+//Handle user clicking 'Confirm' button.
+function confirmCoord(coordPair) {
+  
+    //Show confirmation
+    var confirmation_msg = document.createElement('div');
+    confirmation_msg.innerHTML = "Point Added. <br />";
+    var confirmed_mark = L.marker(coordPair).bindPopup(confirmation_msg);
+    confirmed_pts.addLayer(confirmed_mark);
+
+    if (allowSubmit()){
+      addSubmitBtn(confirmed_mark);
+    }
+
+    confirmed_mark.openPopup();
+}
+
+function addSubmitBtn(confirmed_mark){
+  var submitBtn = document.createElement('a');
+  submitBtn.className = "btn btn-default";
+  submitBtn.innerHTML = "Submit";
+  submitBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    map.closePopup();
+    submit();
+  });
+  confirmed_mark.getPopup().getContent().appendChild(submitBtn);
+}
+
+function allowSubmit(){
+  return confirmed_pts.getLayers().length >= 2;
+}
+
+function submit(){  
+  // Collect points into path and animate
+  var latlngs = confirmed_pts.getLayers().map(function(d){return d.getLatLng();});
+  var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
+  user_layer_group.addLayer(confirmed_poly);
+  confirmed_poly.snakeIn();
+
+  // Transfer markers to submitted group
+  // Redraw submitted markers to keep them visible after clearing confirmed pts
+  var tmp_markers = confirmed_pts.getLayers();
+  confirmed_pts.clearLayers();
+  tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+
+  post_array();
 }
 
 function post_array() {
-  if (geocoder.markers.length >= 2) {
       
-        // take each marker from the geocoder layer and map it to a new array
-        var data = [];
-        $.each(geocoder.markers, function(i, v) { 
-            latlng = v.getLatLng();
-            latitude = latlng.lat;
-            longitude = latlng.lng;
-            data.push([lng, lat]);
-        });
-      
-    $.ajax({
-       type : "POST",
-       url : "/geo",
-       data: JSON.stringify(geocoder.markers),
-       contentType: 'application/json',
-       success: function(result) {
-         console.log("success");
-         var latlngs = data.map(function(d){
-           return new L.LatLng(d[1],d[0]);
-         });
-         var line = L.polyline(latlngs, {snakingSpeed: 200});
-         line.addTo(map).snakeIn();
-         coord_array.length = 0;
-         document.getElementById("array-warn").innerText = "";
-       },
-       error: function (error) {
-         console.log("error: " + eval(error));
-       }
-     });
-  }
-  else {
-    document.getElementById("array-warn").innerText = "Please select at least two points before submitting";
-  }
+  // Transform markers into array of [x,y]
+  var latlngs = confirmed_pts.getLayers().map(function(d){
+   var latlng = d.getLatLng();
+   return [latlng.lng,latlng.lat];
+  });
+
+  $.ajax({
+    type : "POST",
+    url : "/geo",
+    data: JSON.stringify(latlngs),
+    contentType: 'application/json',
+    success: function(result) {
+      console.log("success");
+    },
+    error: function (error) {
+      console.log("error: " + eval(error));
+    }
+  });
 };
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
-//document.getElementById("submit_button").addEventListener("click", post_array);
