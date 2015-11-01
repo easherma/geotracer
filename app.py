@@ -1,10 +1,12 @@
 from flask import Flask
 from flask import render_template
 import os
+import keys
 #enviornmentalvariablesscriptexportbeforeyourunpython
 from flask import render_template, request, redirect, url_for, jsonify
 from cartodb import CartoDBAPIKey, CartoDBException
 import json 
+import requests
 
 app = Flask(__name__)
 cartodb_key = os.environ.get("cartodb_key")
@@ -15,7 +17,7 @@ def index():
     print("HELLO FROM INDEX")
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
     try:
-        carto_geoj = json.dumps(cl.sql("SELECT cartodb_id, ST_COLLECT((ST_SETSRID(p1,4326)), (ST_SETSRID(p2,4326))) AS the_geom FROM geopaths", format='geojson'))
+        carto_geoj = json.dumps(cl.sql("SELECT * FROM points", format='geojson'))
         last_row_id = 0
         print(carto_geoj)
         #print("Length of database is: ", len(carto_geoj['rows']))
@@ -23,20 +25,24 @@ def index():
         print("some error ocurred", e)
     return render_template('index.html', carto_geoj=carto_geoj, last_row_id=last_row_id)
 
-@app.route('/geo', methods=["POST"])
+@app.route('/user_layer_group', methods=['GET', 'POST'])
 def geodata():
     # Query: INSERT INTO geopaths (the_geom) VALUES (ST_SetSRID(ST_Point(" + ds[0].toString() + ", " + coords[1].toString() + "),4326))
-    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
-    geodata = request.json
-    print(geodata)
-    for index in range(1, len(geodata)):
-        try:
-            cl.sql("INSERT INTO geopaths (p1, p2) VALUES (ST_SetSRID(ST_Point(" +
-            str(geodata[index - 1][0]) + ", " + str(geodata[index - 1][1]) + "),4326), ST_SetSRID(ST_Point(" +
-            str(geodata[index][0]) + ", " + str(geodata[index][1]) + "),4326))")
-        except CartoDBException as e:
-            print("some error ocurred", e)
+#    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
+    user_data = request.json
+    r = requests.get('/user_layer_group')
+    print(r.url)
+    print(type(user_data))
+#    for index in range(1, len(geodata)):
+#        try:
+#            cl.sql("INSERT INTO geopaths (p1, p2) VALUES (ST_SetSRID(ST_Point(" +
+#            str(geodata[index - 1][0]) + ", " + str(geodata[index - 1][1]) + "),4326), ST_SetSRID(ST_Point(" +
+#            str(geodata[index][0]) + ", " + str(geodata[index][1]) + "),4326))")
+#        except CartoDBException as e:
+#            print("some error ocurred", e)
     return redirect(url_for('index'))
+
+
 
 @app.route('/more')
 def update():

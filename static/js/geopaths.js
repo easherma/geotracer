@@ -163,6 +163,7 @@ function submit(){
   post_array();
 }
 
+
 function post_array() {
       
   // Transform markers into array of [x,y]
@@ -170,11 +171,12 @@ function post_array() {
    var latlng = d.getLatLng();
    return [latlng.lng,latlng.lat];
   });
+  
 
   $.ajax({
     type : "POST",
-    url : "/geo",
-    data: JSON.stringify(latlngs),
+    url : "/user_layer_group",
+    data: JSON.stringify(user_layer_group.toGeoJSON()),
     contentType: 'application/json',
     success: function(result) {
       console.log("success");
