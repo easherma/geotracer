@@ -22,7 +22,7 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 var geocoder_options = {position: 'topright'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
-// this loads data and does the inital animation
+// this loads data into a leaflet layer
 geoj.features.forEach(function(feat){
   // Assume each feature is a Multipoint geometry
   // (which is ordered Long,Lat. Leaflet expects Lat,Long
@@ -44,6 +44,11 @@ geoj.features.forEach(function(feat){
   }
   
 });
+// Do initial animation:
+//Snakein on each layer animates all at once
+strangers_layer_group.eachLayer(function(x){x.snakeIn()});
+//Snakein on the layergroup animates one at a time
+//strangers_layer_group.snakeIn();
 
 //Create leaflet control to toggle map layers
 var baseMaps = {
@@ -53,10 +58,6 @@ var baseMaps = {
 var overlayControl = L.control.layers(baseMaps);
 overlayControl.options.position = 'bottomright';
 overlayControl.addTo(map);
-//Snakein on each layer animates all at once
-overlayMaps.strangers.eachLayer(function(x){x.snakeIn()});
-//Snakein on the layergroup animates one at a time
-//overlayMaps.strangers.snakeIn();
 
 //Gets new rows from the server and plots them.
 //update_map executes periodically and indefinitely until server returns error
