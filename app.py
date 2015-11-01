@@ -34,6 +34,7 @@ def geodata():
     print(user_data)
     try:
             cl.sql("CREATE TABLE temp AS WITH data AS (SELECT" + geodata + "::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f;"
+    # cl.sql("SELECT json_agg(properties), ST_COLLECT(geom), array_agg(gid) from temp")
     except CartoDBException as e:
             print("some error ocurred", e)
     return redirect(url_for('index'))
