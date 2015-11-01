@@ -252,6 +252,7 @@
         */
         resultItem['place'] = {};
         resultItem['place'].name = feature.properties.name;
+        resultItem['place'].region = feature.properties.region;
         resultItem['place'].country = feature.properties.country;
 
         // Point or polygon icon
@@ -301,7 +302,7 @@
         confirmBtn.addEventListener('click',function(){
           // Prevent doubletap
           map.closePopup();
-          confirmCoord(geo);
+          confirmCoord(geo,place);
         });
         var popupContent = document.createElement("div");
         popupContent.innerHTML = text + "<br />";

@@ -116,12 +116,14 @@ function update_map() {
 }
 
 //Handle user clicking 'Confirm' button.
-function confirmCoord(coordPair) {
+function confirmCoord(coordPair,place) {
   
     //Show confirmation
     var confirmation_msg = document.createElement('div');
     confirmation_msg.innerHTML = "Point Added. <br />";
-    var confirmed_mark = L.marker(coordPair).bindPopup(confirmation_msg);
+    // Add tooltip to marker showing placename.
+    var markerTitle = place.name + "," + place.region + "," + place.country;
+    var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
     confirmed_pts.addLayer(confirmed_mark);
 
     if (allowSubmit()){
@@ -148,6 +150,7 @@ function allowSubmit(){
 }
 
 function submit(){  
+  post_array();
   // Collect points into path and animate
   var latlngs = confirmed_pts.getLayers().map(function(d){return d.getLatLng();});
   var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
@@ -160,23 +163,26 @@ function submit(){
   confirmed_pts.clearLayers();
   tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
 
-  post_array();
 }
 
 
 function post_array() {
       
-  // Transform markers into array of [x,y]
-  var latlngs = confirmed_pts.getLayers().map(function(d){
-   var latlng = d.getLatLng();
-   return [latlng.lng,latlng.lat];
+  var geoJ = confirmed_pts.toGeoJSON();
+
+  // Parse titles from markers and add to geoJSON representation
+  var titles = confirmed_pts.getLayers().map(function(d){
+   return d.options.title;
+  }); 
+  geoJ.features.forEach(function(feat,i){
+    feat.properties['place'] = titles[i];
   });
   
 
   $.ajax({
     type : "POST",
-    url : "/user_layer_group",
-    data: JSON.stringify(user_layer_group.toGeoJSON()),
+    url : "/geo",
+    data: JSON.stringify(geoJ),
     contentType: 'application/json',
     success: function(result) {
       console.log("success");
