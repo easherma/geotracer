@@ -7,6 +7,7 @@ from flask import render_template, request, redirect, url_for, jsonify
 from cartodb import CartoDBAPIKey, CartoDBException
 import json 
 import requests
+import geojson
 
 app = Flask(__name__)
 cartodb_key = os.environ.get("cartodb_key")
@@ -25,21 +26,17 @@ def index():
         print("some error ocurred", e)
     return render_template('index.html', carto_geoj=carto_geoj, last_row_id=last_row_id)
 
-@app.route('/user_layer_group', methods=['GET', 'POST'])
+@app.route('/geo', methods=['GET', 'POST'])
 def geodata():
     # Query: INSERT INTO geopaths (the_geom) VALUES (ST_SetSRID(ST_Point(" + ds[0].toString() + ", " + coords[1].toString() + "),4326))
-#    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
-    user_data = request.json
-    r = requests.get('/user_layer_group')
-    print(r.url)
-    print(type(user_data))
-#    for index in range(1, len(geodata)):
-#        try:
-#            cl.sql("INSERT INTO geopaths (p1, p2) VALUES (ST_SetSRID(ST_Point(" +
-#            str(geodata[index - 1][0]) + ", " + str(geodata[index - 1][1]) + "),4326), ST_SetSRID(ST_Point(" +
-#            str(geodata[index][0]) + ", " + str(geodata[index][1]) + "),4326))")
-#        except CartoDBException as e:
-#            print("some error ocurred", e)
+    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
+    geodata = request.json
+    print(user_data)
+    for index in range(1, len(geodata)):
+        try:
+            cl.sql("CREATE TABLE temp AS WITH data AS (SELECT" + geodata + "::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f;"
+        except CartoDBException as e:
+            print("some error ocurred", e)
     return redirect(url_for('index'))
 
 
