@@ -27,21 +27,23 @@ geoj.features.forEach(function(feat){
   // Assume each feature is a Multipoint geometry
   // (which is ordered Long,Lat. Leaflet expects Lat,Long
   var coords = feat.geometry.coordinates.map(function(p){return p.reverse();});
+  
+  // Skip route if any coordinate is null
+  if(coords.reduce(function(notNull,coord){return notNull && coord != null;},true)){
+    
+    // Create layer group for a route.
+    var route = L.featureGroup([L.marker(coords[0])]);
+    for (var i = 1; i < coords.length; i ++){
+      route.addLayer(L.polyline([coords[i-1],coords[i]]));
+      route.addLayer(L.marker(coords[i]));
+    }
 
-  // Create layer group for each route.
-  var route = L.featureGroup([L.marker(coords[0])]);
-  for (var i = 1; i < coords.length; i ++){
-    route.addLayer(L.polyline([coords[i-1],coords[i]]));
-    route.addLayer(L.marker(coords[i]));
+    //Add route layer group to grouping of all non-user routes
+    strangers_layer_group.addLayer(route);
+
   }
   
-  //Add route layer group to grouping of all non-user routes
-  strangers_layer_group.addLayer(route);
 });
-
-/* Alternatively, add geoJson straight to group.
- * strangers_layer_group.addLayer(L.geoJson(geoj));
- */
 
 //Create leaflet control to toggle map layers
 var baseMaps = {
