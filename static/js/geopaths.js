@@ -106,7 +106,7 @@ function update_map() {
   });
 }
 
-function addMarkerToArray(coordPair) {
+function confirmCoord(coordPair) {
     coord_array.push(coordPair);
 }
 
