@@ -32,9 +32,11 @@ def index():
 @app.route('/geo', methods=['GET', 'POST'])
 def geodata():
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
+    #TODO: validate that geoJSON is valid and nonmalicious
     geodata = json.dumps(request.json)
     try:
         #TODO: Store places as array of string, not array of object
+        #TODO: user parameter binding instead of string concatenation
         result = json.dumps(cl.sql("DROP TABLE temp ; CREATE TABLE temp AS WITH data AS (SELECT '" + geodata + "'::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f; INSERT INTO points (the_geom, pelias_label,session_id) SELECT ST_COLLECT(ST_SETSRID(geom, 4326)), json_agg(properties), max(gid) from temp;"))
     except CartoDBException as e:
         print("some error ocurred", e)
@@ -43,8 +45,9 @@ def geodata():
 @app.route('/more')
 def update():
     cl = CartoDBAPIKey('',cartodb_user)
-    prevRow = request.args.get('rowid','')
+    prevRow = int(request.args.get('rowid',''))
     try:
+        #TODO: user parameter binding instead of string concatenation
         carto_geoj = cl.sql("SELECT the_geom FROM points WHERE cartodb_id > " + str(prevRow) + ";", format='geojson')
 
         #TODO: Parse array of strings, not array of objects as place labels
