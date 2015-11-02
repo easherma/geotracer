@@ -57,7 +57,7 @@
     <br>
     <p id="array-warn" style="color: red;"></p>
     <script>
-      var geoj = {% autoescape false %}{{carto_geoj}}{% endautoescape %};
+      var geoj = {{carto_geoj|tojson}};
       var geoplaces = {{ carto_places|tojson }}; 
       var prevRowId = {{ last_row_id }};
     </script>

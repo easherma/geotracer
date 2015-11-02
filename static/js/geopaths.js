@@ -29,7 +29,7 @@ var geocoder_options = {position: 'topright'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // this loads data into a leaflet layer
-drawMultipoints(geoj.features,geoplaces,strangers_layer_group);
+drawMultipoints(JSON.parse(geoj).features,geoplaces,strangers_layer_group);
 
 //Create leaflet control to toggle map layers
 var baseMaps = {
