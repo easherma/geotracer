@@ -1,6 +1,10 @@
 from flask import Flask
 from flask import render_template
 import os
+<<<<<<< HEAD
+=======
+#import keys
+>>>>>>> origin/master
 from flask import render_template, request, redirect, url_for, jsonify
 from cartodb import CartoDBAPIKey, CartoDBException
 import json 
