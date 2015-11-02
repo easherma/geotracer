@@ -20,7 +20,6 @@ def index():
     try:
         carto_geoj = json.dumps(cl.sql("SELECT * FROM points", format='geojson'))
         last_row_id = 0
-        print(carto_geoj)
         #print("Length of database is: ", len(carto_geoj['rows']))
     except CartoDBException as e:
         print("some error ocurred", e)
@@ -30,13 +29,13 @@ def index():
 def geodata():
     # Query: INSERT INTO geopaths (the_geom) VALUES (ST_SetSRID(ST_Point(" + ds[0].toString() + ", " + coords[1].toString() + "),4326))
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
-    geodata = request.json
-    print(user_data)
+    geodata = json.dumps(request.json)
+    print(geodata)
     try:
-            cl.sql("CREATE TABLE temp AS WITH data AS (SELECT" + geodata + "::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f;"
-    # cl.sql("SELECT json_agg(properties), ST_COLLECT(geom), array_agg(gid) from temp")
+        result = json.dumps(cl.sql("DROP TABLE temp ; CREATE TABLE temp AS WITH data AS (SELECT '" + geodata + "'::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f; INSERT INTO points (the_geom, pelias_label,session_id) SELECT ST_COLLECT(ST_SETSRID(geom, 4326)), json_agg(properties), max(gid) from temp;"))
+        print(result)
     except CartoDBException as e:
-            print("some error ocurred", e)
+        print("some error ocurred", e)
     return redirect(url_for('index'))
 
 
