@@ -1,8 +1,6 @@
 from flask import Flask
 from flask import render_template
 import os
-import keys
-#enviornmentalvariablesscriptexportbeforeyourunpython
 from flask import render_template, request, redirect, url_for, jsonify
 from cartodb import CartoDBAPIKey, CartoDBException
 import json 
@@ -33,7 +31,6 @@ def geodata():
     print(geodata)
     try:
         result = json.dumps(cl.sql("DROP TABLE temp ; CREATE TABLE temp AS WITH data AS (SELECT '" + geodata + "'::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f; INSERT INTO points (the_geom, pelias_label,session_id) SELECT ST_COLLECT(ST_SETSRID(geom, 4326)), json_agg(properties), max(gid) from temp;"))
-        print(result)
     except CartoDBException as e:
         print("some error ocurred", e)
     return redirect(url_for('index'))
