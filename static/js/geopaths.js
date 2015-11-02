@@ -29,32 +29,7 @@ var geocoder_options = {position: 'topright'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // this loads data into a leaflet layer
-geoj.features.forEach(function(feat){
-  // Assume each feature is a Multipoint geometry
-  // (which is ordered Long,Lat. Leaflet expects Lat,Long
-  var coords = feat.geometry.coordinates.map(function(p){return p.reverse();});
-  
-  // Skip route if any coordinate is null
-  if(coords.reduce(function(notNull,coord){return notNull && coord != null;},true)){
-    
-    // Create layer group for a route.
-    var route = L.featureGroup([L.marker(coords[0])]);
-    for (var i = 1; i < coords.length; i ++){
-      route.addLayer(L.polyline([coords[i-1],coords[i]]));
-      route.addLayer(L.marker(coords[i]));
-    }
-
-    //Add route layer group to grouping of all non-user routes
-    strangers_layer_group.addLayer(route);
-
-  }
-  
-});
-// Do initial animation:
-//Snakein on each layer animates all at once
-strangers_layer_group.eachLayer(function(x){x.snakeIn()});
-//Snakein on the layergroup animates one at a time
-//strangers_layer_group.snakeIn();
+drawMultipoints(geoj.features,geoplaces,strangers_layer_group);
 
 //Create leaflet control to toggle map layers
 var baseMaps = {
@@ -72,7 +47,7 @@ overlayControl.addTo(map);
 //Gets new rows from the server and plots them.
 //update_map executes periodically and indefinitely until server returns error
 // It is also asynchronous, so control moves past this line
-//update_map(); //commented out while backend is in flux
+update_map();
 
 //commented out while front end is in flux
 //document.getElementById("submit_button").addEventListener("click", post_array);
@@ -97,21 +72,39 @@ function update_map() {
     data : "rowid=" + prevRowId,
     contentType : "text",
     success : function(result) {
-      result.rows.forEach(function(row,i){
-        if(row.p1 != null && row.p2 != null){
-          var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
-          var line = L.polyline(latlngs,{snakingSpeed: 200}); 
-          line.addTo(map).snakeIn();
-        }
-        if(prevRowId < row.cartodb_id){
-          prevRowId = row.cartodb_id;
-        }
-      });
+      // Set current row
+      prevRowId = result.lastrowid;
+
+      drawMultipoints(result.multipoints.features,result.places,strangers_layer_group);
+
       setTimeout(update_map,UPDATE_INTERVAL);
     },
     error : function(error) {
       console.log("error: " + error);
     }
+  });
+}
+
+// Add array of Multipoint geoJSON features to a layer and animate.
+function drawMultipoints(multipoints,places,layer){
+
+  multipoints.forEach(function(mp,i){
+    //Reverse coordinates from Lng,Lat to Lat,Lng
+    var coords = mp.geometry.coordinates.map(function(p){return p.reverse();});
+
+    // Transform multipoint to featuregroup of alternating points and line segments.
+    var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place})]);
+    for (var j = 1; j < coords.length; j ++){
+      route.addLayer(L.polyline([coords[j-1],coords[j]]));
+      route.addLayer(L.marker(coords[j],{title:places[i][j].place}));
+    }
+      
+    // Add featuregroup to specified layer
+    layer.addLayer(route);
+
+    // Run animation on the new route
+    route.snakeIn();
+
   });
 }
 
