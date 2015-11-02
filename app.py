@@ -11,7 +11,7 @@ cartodb_user= os.environ.get("cartodb_user")
 
 @app.route('/')
 def index():
-    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
+    cl = CartoDBAPIKey('',cartodb_user)
     try:
         carto_geoj = json.dumps(cl.sql("SELECT the_geom FROM points", format='geojson'))
 
@@ -42,7 +42,7 @@ def geodata():
 
 @app.route('/more')
 def update():
-    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
+    cl = CartoDBAPIKey('',cartodb_user)
     prevRow = request.args.get('rowid','')
     try:
         carto_geoj = cl.sql("SELECT the_geom FROM points WHERE cartodb_id > " + str(prevRow) + ";", format='geojson')
