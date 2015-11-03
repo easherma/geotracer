@@ -10,9 +10,9 @@ var confirmed_pts = L.layerGroup();
 //We will add points to this group as they are submitted.
 var user_layer_group = L.layerGroup();
 
-//Create grouping of non-user-submitted paths.
+//Create grouping of all paths.
 //We will add paths to the group as they are retrieved from the db.
-var strangers_layer_group = L.featureGroup();
+var all_layer_group = L.featureGroup();
 
 // Show the whole world in this first view.
 var map = L.map('map', {
@@ -21,7 +21,7 @@ var map = L.map('map', {
   inertia: false,
   minZoom: 2,
   continuousWorld: false,
-  layers: [confirmed_pts,user_layer_group,strangers_layer_group] //layers added here are shown by default
+  layers: [confirmed_pts,user_layer_group,all_layer_group] //layers added here are shown by default
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -29,36 +29,11 @@ var geocoder_options = {position: 'topright'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // this loads data into a leaflet layer
-geoj.features.forEach(function(feat){
-  // Assume each feature is a Multipoint geometry
-  // (which is ordered Long,Lat. Leaflet expects Lat,Long
-  var coords = feat.geometry.coordinates.map(function(p){return p.reverse();});
-  
-  // Skip route if any coordinate is null
-  if(coords.reduce(function(notNull,coord){return notNull && coord != null;},true)){
-    
-    // Create layer group for a route.
-    var route = L.featureGroup([L.marker(coords[0])]);
-    for (var i = 1; i < coords.length; i ++){
-      route.addLayer(L.polyline([coords[i-1],coords[i]]));
-      route.addLayer(L.marker(coords[i]));
-    }
-
-    //Add route layer group to grouping of all non-user routes
-    strangers_layer_group.addLayer(route);
-
-  }
-  
-});
-// Do initial animation:
-//Snakein on each layer animates all at once
-strangers_layer_group.eachLayer(function(x){x.snakeIn()});
-//Snakein on the layergroup animates one at a time
-//strangers_layer_group.snakeIn();
+drawMultipoints(JSON.parse(geoj).features,geoplaces,all_layer_group,false);
 
 //Create leaflet control to toggle map layers
 var baseMaps = {
-  "strangers": strangers_layer_group,
+  "all": all_layer_group,
   "none" : L.layerGroup()
 };
 var overlayMaps = {
@@ -72,7 +47,7 @@ overlayControl.addTo(map);
 //Gets new rows from the server and plots them.
 //update_map executes periodically and indefinitely until server returns error
 // It is also asynchronous, so control moves past this line
-//update_map(); //commented out while backend is in flux
+update_map();
 
 //commented out while front end is in flux
 //document.getElementById("submit_button").addEventListener("click", post_array);
@@ -97,20 +72,43 @@ function update_map() {
     data : "rowid=" + prevRowId,
     contentType : "text",
     success : function(result) {
-      result.rows.forEach(function(row,i){
-        if(row.p1 != null && row.p2 != null){
-          var latlngs = [geoJSONToLLatLng(row.p1),geoJSONToLLatLng(row.p2)];
-          var line = L.polyline(latlngs,{snakingSpeed: 200}); 
-          line.addTo(map).snakeIn();
-        }
-        if(prevRowId < row.cartodb_id){
-          prevRowId = row.cartodb_id;
-        }
-      });
+      // Set current row
+      prevRowId = result.lastrowid;
+
+      // Call with bring_to_back:=true so updates which may contain user paths dont draw over user paths.
+      drawMultipoints(result.multipoints.features,result.places,all_layer_group,true);
+
       setTimeout(update_map,UPDATE_INTERVAL);
     },
     error : function(error) {
       console.log("error: " + error);
+    }
+  });
+}
+
+// Add array of Multipoint geoJSON features to a layer and animate.
+function drawMultipoints(multipoints,places,layer,bring_to_back){
+
+  multipoints.forEach(function(mp,i){
+    //Reverse coordinates from Lng,Lat to Lat,Lng
+    var coords = mp.geometry.coordinates.map(function(p){return p.reverse();});
+
+    // Transform multipoint to featuregroup of alternating points and line segments.
+    var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place})]);
+    for (var j = 1; j < coords.length; j ++){
+      route.addLayer(L.polyline([coords[j-1],coords[j]]));
+      route.addLayer(L.marker(coords[j],{title:places[i][j].place}));
+    }
+      
+    // Add featuregroup to specified layer
+    layer.addLayer(route);
+
+    if (bring_to_back) {
+      // Send layer group to bottom. And don't animate (which brings it to fore.)
+      layer.bringToBack();
+    } else {
+      // Run animation on the new route
+      route.snakeIn();
     }
   });
 }

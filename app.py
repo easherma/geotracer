@@ -11,43 +11,57 @@ cartodb_user= os.environ.get("cartodb_user")
 
 @app.route('/')
 def index():
-    print("HELLO FROM INDEX")
-    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
+    cl = CartoDBAPIKey('',cartodb_user)
     try:
-        carto_geoj = json.dumps(cl.sql("SELECT * FROM points", format='geojson'))
-        last_row_id = 0
-        #print("Length of database is: ", len(carto_geoj['rows']))
+        carto_geoj = json.dumps(cl.sql("SELECT the_geom FROM points", format='geojson'))
+
+        #TODO: Parse array of strings, not array of objects as place labels
+        labels_resp = cl.sql("SELECT pelias_label FROM points;")
+        labels = [[y for y in json.loads(x['pelias_label'])] for x in labels_resp['rows']]
+
+        last_row_id_resp = cl.sql("SELECT MAX(cartodb_id) AS id FROM points")
+        last_row_id = last_row_id_resp['rows'][0]['id']
+
     except CartoDBException as e:
         print("some error ocurred", e)
-    return render_template('index.html', carto_geoj=carto_geoj, last_row_id=last_row_id)
+    return render_template('index.html', 
+                           carto_geoj=carto_geoj, 
+                           carto_places=labels,
+                           last_row_id=last_row_id)
 
 @app.route('/geo', methods=['GET', 'POST'])
 def geodata():
-    # Query: INSERT INTO geopaths (the_geom) VALUES (ST_SetSRID(ST_Point(" + ds[0].toString() + ", " + coords[1].toString() + "),4326))
     cl = CartoDBAPIKey(cartodb_key, cartodb_user)
+    #TODO: validate that geoJSON is valid and nonmalicious
     geodata = json.dumps(request.json)
-    print(geodata)
     try:
+        #TODO: Store places as array of string, not array of object
+        #TODO: user parameter binding instead of string concatenation
         result = json.dumps(cl.sql("DROP TABLE temp ; CREATE TABLE temp AS WITH data AS (SELECT '" + geodata + "'::json AS fc) SELECT row_number() OVER () AS gid, ST_AsText(ST_GeomFromGeoJSON(feat->>'geometry')) AS geom, feat->'properties' AS properties FROM (SELECT json_array_elements(fc->'features') AS feat FROM data) AS f; INSERT INTO points (the_geom, pelias_label,session_id) SELECT ST_COLLECT(ST_SETSRID(geom, 4326)), json_agg(properties), max(gid) from temp;"))
     except CartoDBException as e:
         print("some error ocurred", e)
     return redirect(url_for('index'))
 
-
-
 @app.route('/more')
 def update():
-    cl = CartoDBAPIKey(cartodb_key, cartodb_user)
-    prevRow = request.args.get('rowid','')
+    cl = CartoDBAPIKey('',cartodb_user)
+    prevRow = int(request.args.get('rowid',''))
     try:
-        carto_geoj = cl.sql("SELECT cartodb_id," +
-            "ST_AsGeoJSON(p1) as p1," +
-            "ST_AsGeoJSON(p2) as p2," +
-            "FROM geopaths " +
-            "WHERE cartodb_id > " + str(prevRow) + ";")
+        #TODO: user parameter binding instead of string concatenation
+        carto_geoj = cl.sql("SELECT the_geom FROM points WHERE cartodb_id > " + str(prevRow) + ";", format='geojson')
+
+        #TODO: Parse array of strings, not array of objects as place labels
+        labels_resp = cl.sql("SELECT pelias_label FROM points WHERE cartodb_id > " + str(prevRow) + ";")
+        labels = [[y for y in json.loads(x['pelias_label'])] for x in labels_resp['rows']]
+
+        last_row_id_resp = cl.sql("SELECT MAX(cartodb_id) AS id FROM points")
+        last_row_id = last_row_id_resp['rows'][0]['id']
+
     except CartoDBException as e:
         print("some error occurred", e)
-    return jsonify(carto_geoj)
+    return jsonify(multipoints=carto_geoj,
+                   places=labels,
+                   lastrowid=last_row_id)
 
     
  
