@@ -29,7 +29,7 @@ var geocoder_options = {position: 'topright'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // this loads data into a leaflet layer
-drawMultipoints(JSON.parse(geoj).features,geoplaces,strangers_layer_group);
+drawMultipoints(JSON.parse(geoj).features,geoplaces,strangers_layer_group,false);
 
 //Create leaflet control to toggle map layers
 var baseMaps = {
@@ -75,7 +75,8 @@ function update_map() {
       // Set current row
       prevRowId = result.lastrowid;
 
-      drawMultipoints(result.multipoints.features,result.places,strangers_layer_group);
+      // Call with bring_to_back:=true so updates which may contain user paths dont draw over user paths.
+      drawMultipoints(result.multipoints.features,result.places,strangers_layer_group,true);
 
       setTimeout(update_map,UPDATE_INTERVAL);
     },
@@ -86,7 +87,7 @@ function update_map() {
 }
 
 // Add array of Multipoint geoJSON features to a layer and animate.
-function drawMultipoints(multipoints,places,layer){
+function drawMultipoints(multipoints,places,layer,bring_to_back){
 
   multipoints.forEach(function(mp,i){
     //Reverse coordinates from Lng,Lat to Lat,Lng
@@ -102,9 +103,13 @@ function drawMultipoints(multipoints,places,layer){
     // Add featuregroup to specified layer
     layer.addLayer(route);
 
-    // Run animation on the new route
-    route.snakeIn();
-
+    if (bring_to_back) {
+      // Send layer group to bottom. And don't animate (which brings it to fore.)
+      layer.bringToBack();
+    } else {
+      // Run animation on the new route
+      route.snakeIn();
+    }
   });
 }
 
