@@ -129,11 +129,29 @@ function confirmCoord(coordPair,place) {
     var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
     confirmed_pts.addLayer(confirmed_mark);
 
+    addClearBtn(confirmed_mark);
+
     if (allowSubmit()){
       addSubmitBtn(confirmed_mark);
     }
 
     confirmed_mark.openPopup();
+}
+
+function addClearBtn(confirmed_mark){
+  var clearBtn = document.createElement('a');
+  clearBtn.className = "btn btn-default";
+  clearBtn.innerHTML = "Clear";
+  clearBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    map.closePopup();
+    clear();
+  });
+  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+}
+
+function clear(){
+ confirmed_pts.clearLayers(); 
 }
 
 function addSubmitBtn(confirmed_mark){
@@ -153,18 +171,24 @@ function allowSubmit(){
 }
 
 function submit(){  
-  post_array();
-  // Collect points into path and animate
-  var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
-  var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
-  user_layer_group.addLayer(confirmed_poly);
-  confirmed_poly.snakeIn();
 
-  // Transfer markers to submitted group
-  // Redraw submitted markers to keep them visible after clearing confirmed pts
-  var tmp_markers = confirmed_pts.getLayers();
-  confirmed_pts.clearLayers();
-  tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+  // Doublecheck that there is enough to submit
+  if (allowSubmit()){
+
+    post_array();
+    // Collect points into path and animate
+    var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
+    var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
+    user_layer_group.addLayer(confirmed_poly);
+    confirmed_poly.snakeIn();
+
+    // Transfer markers to submitted group
+    // Redraw submitted markers to keep them visible after clearing confirmed pts
+    var tmp_markers = confirmed_pts.getLayers();
+    confirmed_pts.clearLayers();
+    tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+
+  }
 
 }
 
