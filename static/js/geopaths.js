@@ -10,9 +10,9 @@ var confirmed_pts = L.layerGroup();
 //We will add points to this group as they are submitted.
 var user_layer_group = L.layerGroup();
 
-//Create grouping of non-user-submitted paths.
+//Create grouping of all paths.
 //We will add paths to the group as they are retrieved from the db.
-var strangers_layer_group = L.featureGroup();
+var all_layer_group = L.featureGroup();
 
 // Show the whole world in this first view.
 var map = L.map('map', {
@@ -21,7 +21,7 @@ var map = L.map('map', {
   inertia: false,
   minZoom: 2,
   continuousWorld: false,
-  layers: [confirmed_pts,user_layer_group,strangers_layer_group] //layers added here are shown by default
+  layers: [confirmed_pts,user_layer_group,all_layer_group] //layers added here are shown by default
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -29,11 +29,11 @@ var geocoder_options = {position: 'topright'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // this loads data into a leaflet layer
-drawMultipoints(JSON.parse(geoj).features,geoplaces,strangers_layer_group,false);
+drawMultipoints(JSON.parse(geoj).features,geoplaces,all_layer_group,false);
 
 //Create leaflet control to toggle map layers
 var baseMaps = {
-  "strangers": strangers_layer_group,
+  "all": all_layer_group,
   "none" : L.layerGroup()
 };
 var overlayMaps = {
@@ -76,7 +76,7 @@ function update_map() {
       prevRowId = result.lastrowid;
 
       // Call with bring_to_back:=true so updates which may contain user paths dont draw over user paths.
-      drawMultipoints(result.multipoints.features,result.places,strangers_layer_group,true);
+      drawMultipoints(result.multipoints.features,result.places,all_layer_group,true);
 
       setTimeout(update_map,UPDATE_INTERVAL);
     },
