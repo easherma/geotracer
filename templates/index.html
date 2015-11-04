@@ -20,7 +20,7 @@
             <li>
                 <a href="#about" onclick = $("#menu-close").click(); >About</a>
             </li>
-            <li>
+            <li class = "hidden">
                 <a href="#contact" onclick = $("#menu-close").click(); >Contact</a>
             </li>
         </ul>
@@ -35,34 +35,6 @@
             <a href="#services" class="btn btn-dark btn-lg">Add Your Story!</a>
         </div>
     </header>
-
-    <!-- About -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2>GeoTracer is a mapping project that 'connects the dots' of your family's geographic history..</h2>
-                    <p class="lead"> Submit up to four geo-points from your family's history. Each point represents where a generation of your family lived or grew up. After adding your points, the resulting map will combine with other users' geographic histories to show an interactive crowd-sourced visualization of how disparate origins combine together to create a shared story. </a>.</p>
-                </div>
-            </div>
-            <!-- /.row -->
-        </div>
-        <!-- /.container -->
-    </section>
-    <!-- Map -->
-    <section id="map" class="map">
-        <div id='map' class='dark'></div>
-    <br>
-    
-    <br>
-    <p id="array-warn" style="color: red;"></p>
-    <script>
-      var geoj = {{carto_geoj|tojson}};
-      var geoplaces = {{ carto_places|tojson }}; 
-      var prevRowId = {{ last_row_id }};
-    </script>
-    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
-    </section>
     <!-- Services -->
     <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
     <section id="services" class="services bg-primary">
@@ -70,8 +42,8 @@
             <div class="row text-center">
                 <div class="col-lg-10 col-lg-offset-1">
                     <h2>How to add your story:</h2>
-                    <hr class="small">
-                    <div class="row">
+					<p class="lead"> Submit up to four geo-points from your family's history. Each point represents where a generation of your family lived or grew up. After adding your points, the resulting map will combine with other users' geographic histories to show an interactive crowd-sourced visualization of how disparate origins combine together to create a shared story.</p>
+                    <div class="row hidden">
                         <div class="col-md-2 col-sm-6">
                             <div class="service-item">
                                 <span class="fa-stack fa-4x">
@@ -158,7 +130,36 @@
             </div>
         </div>
     </aside>
+    <!-- Map -->
+    <section id="map" class="map">
+        <div id='map' class='dark'></div>
+    <br>
+    
+    <br>
+    <p id="array-warn" style="color: red;"></p>
+    <script>
+      var geoj = {{carto_geoj|tojson}};
+      var geoplaces = {{ carto_places|tojson }}; 
+      var prevRowId = {{ last_row_id }};
+    </script>
+    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
+    </section>
 
+    <!-- About -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="row text center">
+                <div class="col-lg-10 col-lg-offset-1 text-center">
+					<h2>About:</h2>
+					<hr class="small">
+                    <p class = "lead">GeoTracer is a mapping project that 'connects the dots' of your family's geographic history.[content about migration, hack night project, etc etc]co</p>
+
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
 
 
     <!-- Footer -->
