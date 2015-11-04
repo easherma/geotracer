@@ -25,7 +25,7 @@ var map = L.map('map', {
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-var geocoder_options = {position: 'topright'};
+var geocoder_options = {position: 'topright',expanded: 'true'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // this loads data into a leaflet layer
