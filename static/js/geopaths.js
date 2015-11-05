@@ -120,38 +120,59 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
 
 //Handle user clicking 'Confirm' button.
 function confirmCoord(coordPair,place) {
+
+  //Show confirmation
+  var confirmation_msg = document.createElement('div');
+  if (allowSubmit()){
+    confirmation_msg.innerHTML = "<strong>Point Added.</strong><br />";
+  } else {
+    confirmation_msg.innerHTML = "<strong>Point Added.</strong> If you made a mistake, <wbr> you may choose an option below.<br />";
+  }
+  // Add tooltip to marker showing placename.
+  var markerTitle = place.name + "," + place.region + "," + place.country;
+  var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
+  confirmed_pts.addLayer(confirmed_mark);
+
+  addClearThisBtn(confirmed_mark);
+  addClearAllBtn(confirmed_mark);
   
-    //Show confirmation
-    var confirmation_msg = document.createElement('div');
-    confirmation_msg.innerHTML = "Point Added. <br />";
-    // Add tooltip to marker showing placename.
-    var markerTitle = place.name + "," + place.region + "," + place.country;
-    var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
-    confirmed_pts.addLayer(confirmed_mark);
+  if (allowSubmit()){
+    addSubmitBtn(confirmed_mark);
+  }
 
-    addClearBtn(confirmed_mark);
-
-    if (allowSubmit()){
-      addSubmitBtn(confirmed_mark);
-    }
-
-    confirmed_mark.openPopup();
+  setTimeout(function(){confirmed_mark.openPopup();},350);
 }
 
-function addClearBtn(confirmed_mark){
-  var clearBtn = document.createElement('a');
-  clearBtn.className = "btn btn-default";
-  clearBtn.innerHTML = "Clear";
+function addClearThisBtn(confirmed_mark){
+  var clearBtn = document.createElement('button');
+  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.innerHTML = "Clear this point";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
-    clear();
+    clearThis(confirmed_mark);
   });
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 }
 
-function clear(){
- confirmed_pts.clearLayers(); 
+function clearThis(marker){
+  confirmed_pts.removeLayer(marker); 
+}
+
+function addClearAllBtn(confirmed_mark){
+  var clearBtn = document.createElement('button');
+  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.innerHTML = "Clear all points";
+  clearBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    map.closePopup();
+    clearAll();
+  });
+  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+}
+
+function clearAll(){
+  confirmed_pts.clearLayers(); 
 }
 
 function addSubmitBtn(confirmed_mark){
@@ -161,13 +182,31 @@ function addSubmitBtn(confirmed_mark){
   submitBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
-    submit();
+    showReadyToSubmit(confirmed_mark);
   });
   confirmed_mark.getPopup().getContent().appendChild(submitBtn);
 }
 
 function allowSubmit(){
   return confirmed_pts.getLayers().length >= 2;
+}
+
+function showReadyToSubmit(marker){
+  //Show 'Are you sure you want to submit'
+  var confirmation_msg = document.createElement('div');
+  confirmation_msg.innerHTML = "Are you finished adding <wbr>points to this history?<br />";
+  confirmation_msg.innerHTML += "<button class='btn btn-default' onclick=submit()>Yes</button>";
+  //'No' option re-binds previous popup message to the marker.
+  var noBtn = document.createElement('div');
+  noBtn.className = 'btn btn-default';
+  noBtn.innerText = "No";
+  var oldPopup = marker.getPopup().getContent();
+  noBtn.addEventListener('click',function(){
+    map.closePopup();
+    marker.unbindPopup().bindPopup(oldPopup);
+  });
+  confirmation_msg.appendChild(noBtn);
+  marker.unbindPopup().bindPopup(confirmation_msg).openPopup(); 
 }
 
 function submit(){  
