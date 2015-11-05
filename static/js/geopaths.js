@@ -87,11 +87,16 @@ function update_map() {
 }
 
 // Add array of Multipoint geoJSON features to a layer and animate.
+// Each multipoint represents a different 'story' line
 function drawMultipoints(multipoints,places,layer,bring_to_back){
 
   multipoints.forEach(function(mp,i){
-    //Reverse coordinates from Lng,Lat to Lat,Lng
+    // Transform coordinate pairs from Lng,Lat to Lat,Lng
     var coords = mp.geometry.coordinates.map(function(p){return p.reverse();});
+
+    // Reverse coordinates and places so animation happens in chronological order
+    coords.reverse();
+    places[i].reverse();
 
     // Transform multipoint to featuregroup of alternating points and line segments.
     var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place})]);
@@ -150,7 +155,7 @@ function allowSubmit(){
 function submit(){  
   post_array();
   // Collect points into path and animate
-  var latlngs = confirmed_pts.getLayers().map(function(d){return d.getLatLng();});
+  var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
   var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
   user_layer_group.addLayer(confirmed_poly);
   confirmed_poly.snakeIn();
