@@ -150,7 +150,7 @@ function allowSubmit(){
 function submit(){  
   post_array();
   // Collect points into path and animate
-  var latlngs = confirmed_pts.getLayers().map(function(d){return d.getLatLng();});
+  var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
   var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
   user_layer_group.addLayer(confirmed_poly);
   confirmed_poly.snakeIn();
