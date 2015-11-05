@@ -5,40 +5,21 @@ A simple project to connect the geographic dots.
 
 Clone the repo in a local directory
 
-Create a file named keys.py in the format
-
-```python
-cartodb_user = 'INSERT USERNAME'
-cartodb_key = 'INSERT CARTODB API KEY'
+Create a file named keys.py in the format:
 ```
-
+import os
+os.environ["cartodb_user"] = 'domain'
+os.environ["cartodb_key"] = 'apikey'
+```
 **Run the following commands:**
 
-```
+
 cd geopaths
-pip install requirements.txt
-python run.py
+pip install -r requirements.txt
+python app.py
 ```
 
 Navigate to localhost:5000 in your browser and it should be running
-
-Setup CartoDB data structure:  
-
-- Setting up the CartoDb database:  
-    - Create a table according to this schema:  
-      CREATE TABLE geopaths   
-        (cartodb\_id number,   
-         the\_geom geometry,  
-         email string,  
-         lastedited date,  
-         p1 geometry,  
-         p2 geometry,  
-         p3 geometry,  
-         p4 geometry,  
-         p5 geometry);  
-    - Add the non-geometry columns using the CartoDb GUI. To add the point columns, enter PostGIS statements of this form into the CartoDb SQL editor:  
-      SELECT AddGeometryColumn ('geopaths','p1',4326,'POINT',2);  
-
 
 **MVP:**
 Have a user enter at least two locations, maximum of five. These locations are geocoded, stored, and displayed on a map. Lines are drawn connecting the points.
