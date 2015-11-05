@@ -182,8 +182,11 @@ hr.small {
 
 /* Map */
 
-.map {
-    height: 500px;
+#map {
+    margin: auto;
+    height: 100%;
+    width: 93%;
+    
 }
 
 @media(max-width:768px) {
