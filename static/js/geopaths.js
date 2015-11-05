@@ -120,20 +120,59 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
 
 //Handle user clicking 'Confirm' button.
 function confirmCoord(coordPair,place) {
+
+  //Show confirmation
+  var confirmation_msg = document.createElement('div');
+  if (allowSubmit()){
+    confirmation_msg.innerHTML = "<strong>Point Added.</strong><br />";
+  } else {
+    confirmation_msg.innerHTML = "<strong>Point Added.</strong> If you made a mistake, <wbr> you may choose an option below.<br />";
+  }
+  // Add tooltip to marker showing placename.
+  var markerTitle = place.name + "," + place.region + "," + place.country;
+  var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
+  confirmed_pts.addLayer(confirmed_mark);
+
+  addClearThisBtn(confirmed_mark);
+  addClearAllBtn(confirmed_mark);
   
-    //Show confirmation
-    var confirmation_msg = document.createElement('div');
-    confirmation_msg.innerHTML = "Point Added. <br />";
-    // Add tooltip to marker showing placename.
-    var markerTitle = place.name + "," + place.region + "," + place.country;
-    var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
-    confirmed_pts.addLayer(confirmed_mark);
+  if (allowSubmit()){
+    addSubmitBtn(confirmed_mark);
+  }
 
-    if (allowSubmit()){
-      addSubmitBtn(confirmed_mark);
-    }
+  setTimeout(function(){confirmed_mark.openPopup();},350);
+}
 
-    confirmed_mark.openPopup();
+function addClearThisBtn(confirmed_mark){
+  var clearBtn = document.createElement('button');
+  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.innerHTML = "Clear this point";
+  clearBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    map.closePopup();
+    clearThis(confirmed_mark);
+  });
+  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+}
+
+function clearThis(marker){
+  confirmed_pts.removeLayer(marker); 
+}
+
+function addClearAllBtn(confirmed_mark){
+  var clearBtn = document.createElement('button');
+  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.innerHTML = "Clear all points";
+  clearBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    map.closePopup();
+    clearAll();
+  });
+  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+}
+
+function clearAll(){
+  confirmed_pts.clearLayers(); 
 }
 
 function addSubmitBtn(confirmed_mark){
@@ -143,7 +182,7 @@ function addSubmitBtn(confirmed_mark){
   submitBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
-    submit();
+    showReadyToSubmit(confirmed_mark);
   });
   confirmed_mark.getPopup().getContent().appendChild(submitBtn);
 }
@@ -152,19 +191,43 @@ function allowSubmit(){
   return confirmed_pts.getLayers().length >= 2;
 }
 
-function submit(){  
-  post_array();
-  // Collect points into path and animate
-  var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
-  var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
-  user_layer_group.addLayer(confirmed_poly);
-  confirmed_poly.snakeIn();
+function showReadyToSubmit(marker){
+  //Show 'Are you sure you want to submit'
+  var confirmation_msg = document.createElement('div');
+  confirmation_msg.innerHTML = "Are you finished adding <wbr>points to this history?<br />";
+  confirmation_msg.innerHTML += "<button class='btn btn-default' onclick=submit()>Yes</button>";
+  //'No' option re-binds previous popup message to the marker.
+  var noBtn = document.createElement('div');
+  noBtn.className = 'btn btn-default';
+  noBtn.innerText = "No";
+  var oldPopup = marker.getPopup().getContent();
+  noBtn.addEventListener('click',function(){
+    map.closePopup();
+    marker.unbindPopup().bindPopup(oldPopup);
+  });
+  confirmation_msg.appendChild(noBtn);
+  marker.unbindPopup().bindPopup(confirmation_msg).openPopup(); 
+}
 
-  // Transfer markers to submitted group
-  // Redraw submitted markers to keep them visible after clearing confirmed pts
-  var tmp_markers = confirmed_pts.getLayers();
-  confirmed_pts.clearLayers();
-  tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+function submit(){  
+
+  // Doublecheck that there is enough to submit
+  if (allowSubmit()){
+
+    post_array();
+    // Collect points into path and animate
+    var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
+    var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
+    user_layer_group.addLayer(confirmed_poly);
+    confirmed_poly.snakeIn();
+
+    // Transfer markers to submitted group
+    // Redraw submitted markers to keep them visible after clearing confirmed pts
+    var tmp_markers = confirmed_pts.getLayers();
+    confirmed_pts.clearLayers();
+    tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+
+  }
 
 }
 
