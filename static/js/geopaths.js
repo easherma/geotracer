@@ -150,15 +150,21 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     places[i].reverse();
 
     // Transform multipoint to featuregroup of alternating points and line segments.
-    var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place})]);
+    var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place,note:places[i][0].note})]);
     for (var j = 1; j < coords.length; j ++){
       var poly = L.polyline([coords[j-1],coords[j]]);
       (function(layer){
-        layer.on('mouseover',function(){layer.setStyle(biggerLine);});
-        layer.on('mouseout',function(){layer.setStyle(normalLine);});
+        layer.on('mouseover',function(e){
+          layer.setStyle(biggerLine);
+          addNoteTooltip(e,{'grandlayergroup':all_layer_group,'thislayer':layer});
+        });
+        layer.on('mouseout',function(){
+          layer.setStyle(normalLine);
+          removeNoteTooltip();
+        });
       })(poly);
       route.addLayer(poly)
-      route.addLayer(L.marker(coords[j],{title:places[i][j].place}));
+      route.addLayer(L.marker(coords[j],{title:places[i][j].place,note:places[i][j].note}));
     }
       
     // Add featuregroup to specified layer
@@ -278,10 +284,16 @@ function submit(){
     var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
     // For setting hover styles, auto-invoked function recommended by:
     // http://palewi.re/posts/2012/03/26/leaflet-recipe-hover-events-features-and-polygons/ 
-    (function(layer){
-      layer.on('mouseover',function(){layer.setStyle(biggerLine);});
-      layer.on('mouseout',function(){layer.setStyle(normalLine);});
-    })(confirmed_poly);
+    (function(layer,noteText){
+      layer.on('mouseover',function(e){
+        layer.setStyle(biggerLine);
+        addNoteTooltip(e,{'txt':noteText});
+      });
+      layer.on('mouseout',function(){
+        layer.setStyle(normalLine);
+        removeNoteTooltip();
+      });
+    })(confirmed_poly,notesBox.getNote());
     user_layer_group.addLayer(confirmed_poly);
     confirmed_poly.snakeIn();
 
@@ -328,3 +340,42 @@ function post() {
   });
 };
 
+function htmlEncode(unsafeString){
+  return $("<div/>").text(unsafeString).html();
+};
+
+//Find the user note and submit it in a tooltip
+function addNoteTooltip(evnt,arg){
+  var unsafePathNote = "";
+
+  if (arg.hasOwnProperty('txt')){
+    //Already have the note text
+    unsafePathNote = arg.txt;
+  } else {
+    //Only know the layer that's being interacted with
+    //and a guess as to which group it might belong to
+    //Find this layer's siblings,one of which might hold the note
+    var layerOwner;
+    var pathGrandLayerGroup = arg.grandlayergroup;
+    var thisLayer = arg.thislayer;
+    pathGrandLayerGroup.eachLayer(function(x){ if (x.hasLayer(thisLayer)){ layerOwner = x;}});
+    // Concatenate notes from along the path
+    layerOwner.eachLayer(function(x){unsafePathNote += (x.options.note || "");});
+  }
+
+  // The note came straight from the db but was originally supplied by the client.
+  // Best to encode it before inserting into DOM.
+  var safeNoteText = htmlEncode(unsafePathNote);
+  // Create the tooltip. Leaflet directly styles the divIcon,
+  // but we can style the inner div with CSS
+  var tt = L.divIcon({className:'note-tooltip',html:"<div>"+safeNoteText+"</div>"});
+  // Not every user will enter a note, so only add marker to map if note is non-empty 
+  if (safeNoteText) L.marker(evnt.latlng,{icon:tt}).addTo(map);
+};
+
+//Find the note tooltip and remove it
+function removeNoteTooltip(){
+  var tooltip;
+  map.eachLayer(function(x){ if (x.options.icon && x.options.icon.options.className === 'note-tooltip'){tooltip = x;}});
+  if (tooltip) map.removeLayer(tooltip);
+};
