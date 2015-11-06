@@ -35,6 +35,13 @@
   font-family : 'fa';
   font-size : 1.5em;
 }
+.place-tooltip div{
+  background-color : gray;
+  color : white;
+  position : absolute;
+  font-family : 'fa';
+  font-size : 1.5em;
+}
 
 /*
  * The path-start class is added to each line

@@ -150,21 +150,31 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     places[i].reverse();
 
     // Transform multipoint to featuregroup of alternating points and line segments.
-    var route = L.featureGroup([L.circleMarker(coords[0],{radius:6,title:places[i][0].place,note:places[i][0].note})]);
+    var firstMarker = L.circleMarker(coords[0],{radius:6,title:places[i][0].place,note:places[i][0].note});
+    (function(layer){
+      layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+      layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+    })(firstMarker);
+    var route = L.featureGroup([firstMarker]);
     for (var j = 1; j < coords.length; j ++){
       var poly = L.polyline([coords[j-1],coords[j]]);
       (function(layer){
         layer.on('mouseover',function(e){
           layer.setStyle(biggerLine);
-          addNoteTooltip(e,{'grandlayergroup':all_layer_group,'thislayer':layer});
+          addTooltip(e,{'type':'note','grandlayergroup':all_layer_group,'thislayer':layer});
         });
         layer.on('mouseout',function(){
           layer.setStyle(normalLine);
-          removeNoteTooltip();
+          removeTooltip({'type':'note'});
         });
       })(poly);
       route.addLayer(poly)
-      route.addLayer(L.circleMarker(coords[j],{radius:6,title:places[i][j].place,note:places[i][j].note}));
+      var nextMarker = L.circleMarker(coords[j],{radius:6,title:places[i][j].place,note:places[i][j].note});
+      (function(layer){
+        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+      })(nextMarker);
+      route.addLayer(nextMarker);
     }
       
     // Add featuregroup to specified layer
@@ -300,11 +310,11 @@ function submit(){
     (function(layer,noteText){
       layer.on('mouseover',function(e){
         layer.setStyle(biggerLine);
-        addNoteTooltip(e,{'txt':noteText});
+        addTooltip(e,{'type':'note','txt':noteText});
       });
       layer.on('mouseout',function(){
         layer.setStyle(normalLine);
-        removeNoteTooltip();
+        removeTooltip({'type':'note'});
       });
     })(confirmed_poly,notesBox.getNote());
     user_layer_group.addLayer(confirmed_poly);
@@ -314,7 +324,13 @@ function submit(){
     // Redraw submitted markers to keep them visible after clearing confirmed pts
     var tmp_markers = confirmed_pts.getLayers();
     confirmed_pts.clearLayers();
-    tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+    tmp_markers.forEach(function(x){
+      user_layer_group.addLayer(x);
+      (function(layer){
+        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+      })(x);
+    });
 
     notesBox.clear();
     notesBox.hide();
@@ -357,13 +373,13 @@ function htmlEncode(unsafeString){
   return $("<div/>").text(unsafeString).html();
 };
 
-//Find the user note and submit it in a tooltip
-function addNoteTooltip(evnt,arg){
-  var unsafePathNote = "";
+// Show tooltip for note or placename
+function addTooltip(evnt,arg){
+  var unsafeText = "";
 
   if (arg.hasOwnProperty('txt')){
-    //Already have the note text
-    unsafePathNote = arg.txt;
+    //Already have the text
+    unsafeText = arg.txt;
   } else {
     //Only know the layer that's being interacted with
     //and a guess as to which group it might belong to
@@ -373,22 +389,24 @@ function addNoteTooltip(evnt,arg){
     var thisLayer = arg.thislayer;
     pathGrandLayerGroup.eachLayer(function(x){ if (x.hasLayer(thisLayer)){ layerOwner = x;}});
     // Concatenate notes from along the path
-    layerOwner.eachLayer(function(x){unsafePathNote += (x.options.note || "");});
+    layerOwner.eachLayer(function(x){unsafeText += (x.options.note || "");});
   }
 
-  // The note came straight from the db but was originally supplied by the client.
+  // The text came straight from the db but was originally supplied by the client.
   // Best to encode it before inserting into DOM.
-  var safeNoteText = htmlEncode(unsafePathNote);
+  var safeText = htmlEncode(unsafeText);
   // Create the tooltip. Leaflet directly styles the divIcon,
   // but we can style the inner div with CSS
-  var tt = L.divIcon({className:'note-tooltip',html:"<div>"+safeNoteText+"</div>"});
-  // Not every user will enter a note, so only add marker to map if note is non-empty 
-  if (safeNoteText) L.marker(evnt.latlng,{icon:tt}).addTo(map);
+  var classNm = arg.type === 'note' ? 'note-tooltip' : 'place-tooltip';
+  var tt = L.divIcon({className:classNm,html:"<div>"+safeText+"</div>"});
+  // Not every user will enter a note, so only add marker to map if text is non-empty 
+  if (safeText) L.marker(evnt.latlng,{icon:tt}).addTo(map);
 };
 
-//Find the note tooltip and remove it
-function removeNoteTooltip(){
-  var tooltip;
-  map.eachLayer(function(x){ if (x.options.icon && x.options.icon.options.className === 'note-tooltip'){tooltip = x;}});
-  if (tooltip) map.removeLayer(tooltip);
+//Find the tooltip and remove it
+function removeTooltip(arg){
+  var tt;
+  var classNm = arg.type === 'note' ? 'note-tooltip' : 'place-tooltip';
+  map.eachLayer(function(x){ if (x.options.icon && x.options.icon.options.className === classNm){tt = x;}});
+  if (tt) map.removeLayer(tt);
 };
