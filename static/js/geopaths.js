@@ -3,6 +3,9 @@
 // Declare global variables
 var UPDATE_INTERVAL = 30000; //unis of ms
 var geocoderResults; //Referenced in Pelias js 
+var biggerLine = {weight:10,lineCap:'butt'};
+var normalLine = {weight:4,lineCap:'round'};
+
 
 //Create groupings for user-submitted results.
 //We will add points to this group as they are geocoded & confirmed by user.
@@ -149,7 +152,12 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     // Transform multipoint to featuregroup of alternating points and line segments.
     var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place})]);
     for (var j = 1; j < coords.length; j ++){
-      route.addLayer(L.polyline([coords[j-1],coords[j]]));
+      var poly = L.polyline([coords[j-1],coords[j]]);
+      (function(layer){
+        layer.on('mouseover',function(){layer.setStyle(biggerLine);});
+        layer.on('mouseout',function(){layer.setStyle(normalLine);});
+      })(poly);
+      route.addLayer(poly)
       route.addLayer(L.marker(coords[j],{title:places[i][j].place}));
     }
       
@@ -268,6 +276,12 @@ function submit(){
     // Collect points into path and animate
     var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
     var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
+    // For setting hover styles, auto-invoked function recommended by:
+    // http://palewi.re/posts/2012/03/26/leaflet-recipe-hover-events-features-and-polygons/ 
+    (function(layer){
+      layer.on('mouseover',function(){layer.setStyle(biggerLine);});
+      layer.on('mouseout',function(){layer.setStyle(normalLine);});
+    })(confirmed_poly);
     user_layer_group.addLayer(confirmed_poly);
     confirmed_poly.snakeIn();
 
