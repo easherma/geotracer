@@ -28,11 +28,13 @@
 }
 
 .note-tooltip div{
-  background-color : black;
-  color : white;
+  width: 200px;
+  background-color : white;
+  color : black;
+  padding: 2em;
   position : absolute;
   font-family : 'fa';
-  font-size : 1.5em;
+  font-size : 1em;
 }
 .place-tooltip div{
   background-color : gray;

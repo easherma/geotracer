@@ -1,7 +1,7 @@
 .leaflet-pelias-input {
   box-sizing: border-box;
   position: absolute;
-  left: 500px;
+  left: 0;
   top: 0;
   height: 100%;
   width: 100%;
