@@ -3,6 +3,9 @@
 // Declare global variables
 var UPDATE_INTERVAL = 30000; //unis of ms
 var geocoderResults; //Referenced in Pelias js 
+var biggerLine = {weight:10,lineCap:'butt'};
+var normalLine = {weight:4,lineCap:'round'};
+
 
 //Create groupings for user-submitted results.
 //We will add points to this group as they are geocoded & confirmed by user.
@@ -27,6 +30,54 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 var geocoder_options = {position: 'topright',expanded: 'true'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
+
+// Create one form for entering notes. We will show/hide the form and clear its text as needed.
+var notesBoxControl = L.Control.extend({
+    options: {
+      position: 'bottomleft'
+    },
+    onAdd: function(map){
+      this.container = $('<div/>')
+        .attr('id','note-form')
+        .addClass('hide')
+        .html("If you'd like, add a few words about this history...")
+        .on('click',function(e){
+          // Allows markers to stay open and user to interact with both layers.
+          L.DomEvent.stopPropagation(e);
+         })
+        .append(
+          $('<textarea/>')
+         )
+        .append(
+          $('<i/>')
+            .addClass('fa fa-3x fa-check-circle')
+            .on('click',function(e){e.target.parentElement.classList.add('hide');})
+         )
+        .append(
+          $('<i/>')
+            .addClass('fa fa-3x fa-times-circle')
+            .on('click',function(e){
+              e.target.parentElement.classList.add('hide');
+              $(e.target.parentElement).find('textarea').val("");
+            })
+         )
+      return this.container.get(0);
+    },
+    show: function(){
+      this.container.removeClass('hide');
+    },
+    hide: function(){
+      this.container.addClass('hide');
+    },
+    clear: function(){
+      this.container.find('textarea').val("");
+    },
+    getNote: function(){
+      return this.container.find('textarea').val();
+    }
+});
+var notesBox = new notesBoxControl();
+map.addControl(notesBox);
 
 // this loads data into a leaflet layer
 drawMultipoints(JSON.parse(geoj).features,geoplaces,all_layer_group,false);
@@ -99,10 +150,31 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     places[i].reverse();
 
     // Transform multipoint to featuregroup of alternating points and line segments.
-    var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place})]);
+    var firstMarker = L.circleMarker(coords[0],{radius:6,title:places[i][0].place,note:places[i][0].note});
+    (function(layer){
+      layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+      layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+    })(firstMarker);
+    var route = L.featureGroup([firstMarker]);
     for (var j = 1; j < coords.length; j ++){
-      route.addLayer(L.polyline([coords[j-1],coords[j]]));
-      route.addLayer(L.marker(coords[j],{title:places[i][j].place}));
+      var poly = L.polyline([coords[j-1],coords[j]]);
+      (function(layer){
+        layer.on('mouseover',function(e){
+          layer.setStyle(biggerLine);
+          addTooltip(e,{'type':'note','grandlayergroup':all_layer_group,'thislayer':layer});
+        });
+        layer.on('mouseout',function(){
+          layer.setStyle(normalLine);
+          removeTooltip({'type':'note'});
+        });
+      })(poly);
+      route.addLayer(poly)
+      var nextMarker = L.circleMarker(coords[j],{radius:6,title:places[i][j].place,note:places[i][j].note});
+      (function(layer){
+        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+      })(nextMarker);
+      route.addLayer(nextMarker);
     }
       
     // Add featuregroup to specified layer
@@ -130,12 +202,13 @@ function confirmCoord(coordPair,place) {
   }
   // Add tooltip to marker showing placename.
   var markerTitle = place.name + "," + place.region + "," + place.country;
-  var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
+  var confirmed_mark = L.circleMarker(coordPair,{title:markerTitle,radius:7,color:'yellow'}).bindPopup(confirmation_msg);
   confirmed_pts.addLayer(confirmed_mark);
 
   addClearThisBtn(confirmed_mark);
   addClearAllBtn(confirmed_mark);
-  
+  geocoder.marker.unbindPopup(); 
+
   if (allowSubmit()){
     addSubmitBtn(confirmed_mark);
   }
@@ -144,13 +217,19 @@ function confirmCoord(coordPair,place) {
 }
 
 function addClearThisBtn(confirmed_mark){
+  var oldPopup = geocoder.marker.getPopup().getContent();
   var clearBtn = document.createElement('button');
+  var confirmedLatLng = confirmed_mark.getLatLng();
   clearBtn.className = "btn btn-default btn-sm";
   clearBtn.innerHTML = "Clear this point";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
     clearThis(confirmed_mark);
+    if (confirmedLatLng.lat === geocoder.marker.getLatLng().lat 
+      && confirmedLatLng.lng === geocoder.marker.getLatLng().lng){    
+        geocoder.marker.bindPopup(oldPopup);
+      }
   });
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 }
@@ -160,13 +239,19 @@ function clearThis(marker){
 }
 
 function addClearAllBtn(confirmed_mark){
+  var oldPopup = geocoder.marker.getPopup().getContent();
   var clearBtn = document.createElement('button');
+  var confirmedLatLng = confirmed_mark.getLatLng();
   clearBtn.className = "btn btn-default btn-sm";
   clearBtn.innerHTML = "Clear all points";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
     clearAll();
+    if (confirmedLatLng.lat === geocoder.marker.getLatLng().lat 
+      && confirmedLatLng.lng === geocoder.marker.getLatLng().lng){    
+        geocoder.marker.bindPopup(oldPopup);
+      }
   });
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 }
@@ -195,6 +280,8 @@ function showReadyToSubmit(marker){
   //Show 'Are you sure you want to submit'
   var confirmation_msg = document.createElement('div');
   confirmation_msg.innerHTML = "Are you finished adding <wbr>points to this history?<br />";
+  //'Yes' option adds a form to let the user input notes
+  notesBox.show();
   confirmation_msg.innerHTML += "<button class='btn btn-default' onclick=submit()>Yes</button>";
   //'No' option re-binds previous popup message to the marker.
   var noBtn = document.createElement('div');
@@ -214,10 +301,22 @@ function submit(){
   // Doublecheck that there is enough to submit
   if (allowSubmit()){
 
-    post_array();
+    post();
     // Collect points into path and animate
     var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
     var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
+    // For setting hover styles, auto-invoked function recommended by:
+    // http://palewi.re/posts/2012/03/26/leaflet-recipe-hover-events-features-and-polygons/ 
+    (function(layer,noteText){
+      layer.on('mouseover',function(e){
+        layer.setStyle(biggerLine);
+        addTooltip(e,{'type':'note','txt':noteText});
+      });
+      layer.on('mouseout',function(){
+        layer.setStyle(normalLine);
+        removeTooltip({'type':'note'});
+      });
+    })(confirmed_poly,notesBox.getNote());
     user_layer_group.addLayer(confirmed_poly);
     confirmed_poly.snakeIn();
 
@@ -225,16 +324,27 @@ function submit(){
     // Redraw submitted markers to keep them visible after clearing confirmed pts
     var tmp_markers = confirmed_pts.getLayers();
     confirmed_pts.clearLayers();
-    tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
+    tmp_markers.forEach(function(x){
+      user_layer_group.addLayer(x);
+      (function(layer){
+        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+      })(x);
+    });
 
+    notesBox.clear();
+    notesBox.hide();
   }
 
 }
 
 
-function post_array() {
+function post() {
       
   var geoJ = confirmed_pts.toGeoJSON();
+ 
+  // Add free-form note arbitrarily to first geojson feature
+  geoJ.features[0].properties['note'] = notesBox.getNote();
 
   // Parse titles from markers and add to geoJSON representation
   var titles = confirmed_pts.getLayers().map(function(d){
@@ -259,3 +369,44 @@ function post_array() {
   });
 };
 
+function htmlEncode(unsafeString){
+  return $("<div/>").text(unsafeString).html();
+};
+
+// Show tooltip for note or placename
+function addTooltip(evnt,arg){
+  var unsafeText = "";
+
+  if (arg.hasOwnProperty('txt')){
+    //Already have the text
+    unsafeText = arg.txt;
+  } else {
+    //Only know the layer that's being interacted with
+    //and a guess as to which group it might belong to
+    //Find this layer's siblings,one of which might hold the note
+    var layerOwner;
+    var pathGrandLayerGroup = arg.grandlayergroup;
+    var thisLayer = arg.thislayer;
+    pathGrandLayerGroup.eachLayer(function(x){ if (x.hasLayer(thisLayer)){ layerOwner = x;}});
+    // Concatenate notes from along the path
+    layerOwner.eachLayer(function(x){unsafeText += (x.options.note || "");});
+  }
+
+  // The text came straight from the db but was originally supplied by the client.
+  // Best to encode it before inserting into DOM.
+  var safeText = htmlEncode(unsafeText);
+  // Create the tooltip. Leaflet directly styles the divIcon,
+  // but we can style the inner div with CSS
+  var classNm = arg.type === 'note' ? 'note-tooltip' : 'place-tooltip';
+  var tt = L.divIcon({className:classNm,html:"<div>"+safeText+"</div>"});
+  // Not every user will enter a note, so only add marker to map if text is non-empty 
+  if (safeText) L.marker(evnt.latlng,{icon:tt}).addTo(map);
+};
+
+//Find the tooltip and remove it
+function removeTooltip(arg){
+  var tt;
+  var classNm = arg.type === 'note' ? 'note-tooltip' : 'place-tooltip';
+  map.eachLayer(function(x){ if (x.options.icon && x.options.icon.options.className === classNm){tt = x;}});
+  if (tt) map.removeLayer(tt);
+};

@@ -1,4 +1,47 @@
+.hide {  
+  display : none;
+}
 
+#note-form {
+  background-color : white;
+  height : 25em;
+  width : 20em;
+}
+
+#note-form textarea{
+  resize : none;
+  overflow-y: auto;
+  width : 80%;
+  height : 80%;
+  font-family : 'fa';
+}
+
+#note-form .fa-check-circle{
+  color : green;
+  float : right;
+  padding : 0 .25em 0 .25em;
+}
+
+#note-form .fa-times-circle{
+  color : red;
+  float : right;
+  padding : 0 .25em 0 .25em;
+}
+
+.note-tooltip div{
+  background-color : black;
+  color : white;
+  position : absolute;
+  font-family : 'fa';
+  font-size : 1.5em;
+}
+.place-tooltip div{
+  background-color : gray;
+  color : white;
+  position : absolute;
+  font-family : 'fa';
+  font-size : 1.5em;
+}
 
 /*
  * The path-start class is added to each line
