@@ -1,7 +1,7 @@
 .leaflet-pelias-input {
   box-sizing: border-box;
   position: absolute;
-  left: 0;
+  left: 500px;
   top: 0;
   height: 100%;
   width: 100%;
@@ -47,10 +47,11 @@
 
 .leaflet-touch .leaflet-pelias-input {
   background-size: 30px;
+  
 }
 
 .leaflet-pelias-expanded {
-  width: 280px;
+  width: 580px;
   height: 44px;
 }
 

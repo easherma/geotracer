@@ -28,7 +28,7 @@ var map = L.map('map', {
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-var geocoder_options = {position: 'topright',expanded: 'true'};
+var geocoder_options = {position: 'topright',expanded: 'true', placeholder: 'Enter your points here!', title: 'Enter your points here!'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // Create one form for entering notes. We will show/hide the form and clear its text as needed.
