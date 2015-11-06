@@ -303,6 +303,7 @@
           // Prevent doubletap
           map.closePopup();
           confirmCoord(geo,place);
+          geocoder.removeMarkers();
         });
         var popupContent = document.createElement("div");
         popupContent.innerHTML = text + "<br />";

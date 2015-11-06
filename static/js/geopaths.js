@@ -150,7 +150,7 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     places[i].reverse();
 
     // Transform multipoint to featuregroup of alternating points and line segments.
-    var route = L.featureGroup([L.marker(coords[0],{title:places[i][0].place,note:places[i][0].note})]);
+    var route = L.featureGroup([L.circleMarker(coords[0],{radius:6,title:places[i][0].place,note:places[i][0].note})]);
     for (var j = 1; j < coords.length; j ++){
       var poly = L.polyline([coords[j-1],coords[j]]);
       (function(layer){
@@ -164,7 +164,7 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
         });
       })(poly);
       route.addLayer(poly)
-      route.addLayer(L.marker(coords[j],{title:places[i][j].place,note:places[i][j].note}));
+      route.addLayer(L.circleMarker(coords[j],{radius:6,title:places[i][j].place,note:places[i][j].note}));
     }
       
     // Add featuregroup to specified layer
@@ -192,12 +192,13 @@ function confirmCoord(coordPair,place) {
   }
   // Add tooltip to marker showing placename.
   var markerTitle = place.name + "," + place.region + "," + place.country;
-  var confirmed_mark = L.marker(coordPair,{title:markerTitle}).bindPopup(confirmation_msg);
+  var confirmed_mark = L.circleMarker(coordPair,{title:markerTitle,radius:7,color:'yellow'}).bindPopup(confirmation_msg);
   confirmed_pts.addLayer(confirmed_mark);
 
   addClearThisBtn(confirmed_mark);
   addClearAllBtn(confirmed_mark);
-  
+  geocoder.marker.unbindPopup(); 
+
   if (allowSubmit()){
     addSubmitBtn(confirmed_mark);
   }
@@ -206,13 +207,19 @@ function confirmCoord(coordPair,place) {
 }
 
 function addClearThisBtn(confirmed_mark){
+  var oldPopup = geocoder.marker.getPopup().getContent();
   var clearBtn = document.createElement('button');
+  var confirmedLatLng = confirmed_mark.getLatLng();
   clearBtn.className = "btn btn-default btn-sm";
   clearBtn.innerHTML = "Clear this point";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
     clearThis(confirmed_mark);
+    if (confirmedLatLng.lat === geocoder.marker.getLatLng().lat 
+      && confirmedLatLng.lng === geocoder.marker.getLatLng().lng){    
+        geocoder.marker.bindPopup(oldPopup);
+      }
   });
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 }
@@ -222,13 +229,19 @@ function clearThis(marker){
 }
 
 function addClearAllBtn(confirmed_mark){
+  var oldPopup = geocoder.marker.getPopup().getContent();
   var clearBtn = document.createElement('button');
+  var confirmedLatLng = confirmed_mark.getLatLng();
   clearBtn.className = "btn btn-default btn-sm";
   clearBtn.innerHTML = "Clear all points";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
     clearAll();
+    if (confirmedLatLng.lat === geocoder.marker.getLatLng().lat 
+      && confirmedLatLng.lng === geocoder.marker.getLatLng().lng){    
+        geocoder.marker.bindPopup(oldPopup);
+      }
   });
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 }
