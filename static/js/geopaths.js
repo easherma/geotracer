@@ -50,14 +50,14 @@ var notesBoxControl = L.Control.extend({
           .append(
             $('<i/>')
               .addClass('fa fa-3x fa-check-circle')
-              .on('click',function(e){e.target.parentElement.classList.add('hide');})
+              .on('click',function(e){e.target.parentElement.parentElement.classList.add('hide');})
            )
           .append(
             $('<i/>')
               .addClass('fa fa-3x fa-times-circle')
               .on('click',function(e){
-                e.target.parentElement.classList.add('hide');
-                $(e.target.parentElement).find('textarea').val("");
+                e.target.parentElement.parentElement.classList.add('hide');
+                $(e.target.parentElement.parentElement).find('textarea').val("");
               })
            )
          )
