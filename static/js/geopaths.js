@@ -39,27 +39,27 @@ var notesBoxControl = L.Control.extend({
     onAdd: function(map){
       this.container = $('<div/>')
         .attr('id','note-form')
-        .addClass('hide')
-        .html("If you'd like, add a few words about this history...")
+        .addClass('hide col-xs-6 col-md-8 form-group') 
         .on('click',function(e){
           // Allows markers to stay open and user to interact with both layers.
           L.DomEvent.stopPropagation(e);
          })
-        .append(
-          $('<textarea/>')
-         )
-        .append(
-          $('<i/>')
-            .addClass('fa fa-3x fa-check-circle')
-            .on('click',function(e){e.target.parentElement.classList.add('hide');})
-         )
-        .append(
-          $('<i/>')
-            .addClass('fa fa-3x fa-times-circle')
-            .on('click',function(e){
-              e.target.parentElement.classList.add('hide');
-              $(e.target.parentElement).find('textarea').val("");
-            })
+        .append($('<label/>').text("This is a space to share a few words about your submission."))
+        .append($('<textarea/>').addClass("form-control"))
+        .append($('<div/>').addClass('col-xs')
+          .append(
+            $('<i/>')
+              .addClass('fa fa-3x fa-check-circle')
+              .on('click',function(e){e.target.parentElement.parentElement.classList.add('hide');})
+           )
+          .append(
+            $('<i/>')
+              .addClass('fa fa-3x fa-times-circle')
+              .on('click',function(e){
+                e.target.parentElement.parentElement.classList.add('hide');
+                $(e.target.parentElement.parentElement).find('textarea').val("");
+              })
+           )
          )
       return this.container.get(0);
     },
