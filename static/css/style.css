@@ -1,3 +1,31 @@
+.hide {  
+  display : none;
+}
+
+#note-form {
+  background-color : white;
+  height : 25em;
+  width : 20em;
+}
+
+#note-form textarea{
+  resize : none;
+  overflow-y: auto;
+  width : 80%;
+  height : 80%;
+}
+
+#note-form .fa-check-circle{
+  color : green;
+  float : right;
+  padding : 0 .25em 0 .25em;
+}
+
+#note-form .fa-times-circle{
+  color : red;
+  float : right;
+  padding : 0 .25em 0 .25em;
+}
 
 
 /*

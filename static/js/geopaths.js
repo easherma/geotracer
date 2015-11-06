@@ -28,6 +28,54 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 var geocoder_options = {position: 'topright',expanded: 'true'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
+// Create one form for entering notes. We will show/hide the form and clear its text as needed.
+var notesBoxControl = L.Control.extend({
+    options: {
+      position: 'bottomleft'
+    },
+    onAdd: function(map){
+      this.container = $('<div/>')
+        .attr('id','note-form')
+        .addClass('hide')
+        .html("If you'd like, add a few words about this history...")
+        .on('click',function(e){
+          // Allows markers to stay open and user to interact with both layers.
+          L.DomEvent.stopPropagation(e);
+         })
+        .append(
+          $('<textarea/>')
+         )
+        .append(
+          $('<i/>')
+            .addClass('fa fa-3x fa-check-circle')
+            .on('click',function(e){e.target.parentElement.classList.add('hide');})
+         )
+        .append(
+          $('<i/>')
+            .addClass('fa fa-3x fa-times-circle')
+            .on('click',function(e){
+              e.target.parentElement.classList.add('hide');
+              $(e.target.parentElement).find('textarea').val("");
+            })
+         )
+      return this.container.get(0);
+    },
+    show: function(){
+      this.container.removeClass('hide');
+    },
+    hide: function(){
+      this.container.addClass('hide');
+    },
+    clear: function(){
+      this.container.find('textarea').val("");
+    },
+    getNote: function(){
+      return this.container.find('textarea').val();
+    }
+});
+var notesBox = new notesBoxControl();
+map.addControl(notesBox);
+
 // this loads data into a leaflet layer
 drawMultipoints(JSON.parse(geoj).features,geoplaces,all_layer_group,false);
 
@@ -195,6 +243,8 @@ function showReadyToSubmit(marker){
   //Show 'Are you sure you want to submit'
   var confirmation_msg = document.createElement('div');
   confirmation_msg.innerHTML = "Are you finished adding <wbr>points to this history?<br />";
+  //'Yes' option adds a form to let the user input notes
+  notesBox.show();
   confirmation_msg.innerHTML += "<button class='btn btn-default' onclick=submit()>Yes</button>";
   //'No' option re-binds previous popup message to the marker.
   var noBtn = document.createElement('div');
@@ -214,7 +264,7 @@ function submit(){
   // Doublecheck that there is enough to submit
   if (allowSubmit()){
 
-    post_array();
+    post();
     // Collect points into path and animate
     var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
     var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
@@ -227,14 +277,19 @@ function submit(){
     confirmed_pts.clearLayers();
     tmp_markers.forEach(function(x){user_layer_group.addLayer(x);});
 
+    notesBox.clear();
+    notesBox.hide();
   }
 
 }
 
 
-function post_array() {
+function post() {
       
   var geoJ = confirmed_pts.toGeoJSON();
+ 
+  // Add free-form note arbitrarily to first geojson feature
+  geoJ.features[0].properties['note'] = notesBox.getNote();
 
   // Parse titles from markers and add to geoJSON representation
   var titles = confirmed_pts.getLayers().map(function(d){
