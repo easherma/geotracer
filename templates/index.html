@@ -35,6 +35,20 @@
             <a href="#services" class="btn btn-dark btn-lg">Add Your Story!</a>
         </div>
     </header>
+    <!-- Map -->
+    <section id="map" class="map">
+        <div id='map' class='dark'></div>
+    <br>
+    
+    <br>
+    <p id="array-warn" style="color: red;"></p>
+    <script>
+      var geoj = {{carto_geoj|tojson}};
+      var geoplaces = {{ carto_places|tojson }}; 
+      var prevRowId = {{ last_row_id }};
+    </script>
+    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
+    </section>
     <!-- Services -->
     <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
     <section id="services" class="services bg-primary">
@@ -137,20 +151,7 @@
             </div>
         </div>
     </aside>
-    <!-- Map -->
-    <section id="map" class="map">
-        <div id='map' class='dark'></div>
-    <br>
-    
-    <br>
-    <p id="array-warn" style="color: red;"></p>
-    <script>
-      var geoj = {{carto_geoj|tojson}};
-      var geoplaces = {{ carto_places|tojson }}; 
-      var prevRowId = {{ last_row_id }};
-    </script>
-    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
-    </section>
+
 
     <!-- About -->
     <section id="about" class="about">
