@@ -103,6 +103,10 @@ update_map();
 //commented out while front end is in flux
 //document.getElementById("submit_button").addEventListener("click", post_array);
 
+$(function() {
+    var $control = $(".leaflet-pelias-control");
+    $control.prependTo("#input").css("color", "black");
+});
 
 /* ************ FUNCTIONS *********** */
 
@@ -112,6 +116,7 @@ function geoJSONToLLatLng(ptStr) {
   var p = JSON.parse(ptStr);
   return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
+
 
 //Gets new rows from the server and plots them.
 // Executes periodically and indefinitely until server returns an error.

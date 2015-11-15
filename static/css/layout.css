@@ -216,8 +216,29 @@ hr.small {
     margin-bottom: 30px;
 }
 
+/* Modal */
+.modal:nth-of-type(even) {
+    z-index: 1066 !important;
+}
+.modal-backdrop.in:nth-of-type(even) {
+    z-index: 1046 !important;
+}
 
+#myModal {
+top:50%;
+bottom: auto;
+overflow: visible;
+}
 
+#myModal2 {
+top:55%;
+bottom: auto;
+overflow: visible;
+
+}  
+#myModal {
+  
+}
 
 /* Map */
 
