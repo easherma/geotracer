@@ -5,7 +5,7 @@ var UPDATE_INTERVAL = 30000; //unis of ms
 var geocoderResults; //Referenced in Pelias js 
 var biggerLine = {weight:10,lineCap:'butt'};
 var normalLine = {weight:4,lineCap:'round'};
-
+var title = "Title"
 
 //Create groupings for user-submitted results.
 //We will add points to this group as they are geocoded & confirmed by user.
@@ -32,10 +32,10 @@ var geocoder_options = {position: 'topright',expanded: 'true', placeholder: 'Ent
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // Create one form for entering notes. We will show/hide the form and clear its text as needed.
-var notesBoxControl = L.Control.extend({
-    options: {
-      position: 'bottomleft'
-    },
+//var notesBoxControl = L.Control.extend({
+//    options: {
+//      position: 'bottomleft'
+//    },
     onAdd: function(map){
       this.container = $('<div/>')
         .attr('id','note-form')
