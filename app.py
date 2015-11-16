@@ -79,11 +79,11 @@ def index_s(id):
        last_row_id = last_row_id_resp['rows'][0]['id']
 
    except CartoDBException as e:
-       error = ("some error ocurred", e)
+       print("some error ocurred", e)
    return render_template('index.html', 
                           carto_geoj=carto_geoj, 
                           carto_places=labels,
-                          last_row_id=last_row_id, error = error )   
+                          last_row_id=last_row_id)   
  
 if __name__ == '__main__':
    app.run(debug=True)
