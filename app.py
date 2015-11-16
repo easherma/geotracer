@@ -16,12 +16,10 @@ cartodb_user= os.environ.get("cartodb_user")
 def index():
     cl = CartoDBAPIKey('',cartodb_user)
     try:
-        carto_geoj = cl.sql("SELECT the_geom FROM points WHERE cartodb_id=61", format='geojson')
-
+        carto_geoj = json.dumps(cl.sql("SELECT the_geom FROM points;", format='geojson'))
         #TODO: Parse array of strings, not array of objects as place labels
-        labels_resp = cl.sql("SELECT pelias_label FROM points WHERE cartodb_id=61;")
+        labels_resp = cl.sql("SELECT pelias_label FROM points;")
         labels = [[y for y in json.loads(x['pelias_label'])] for x in labels_resp['rows']]
-
         last_row_id_resp = cl.sql("SELECT MAX(cartodb_id) AS id FROM points")
         last_row_id = last_row_id_resp['rows'][0]['id']
 
@@ -46,20 +44,7 @@ def geodata():
         print("some error ocurred", e)
     return redirect(url_for('index'))
 
-@app.route('/welcome')
-def welcome():
-    cl = CartoDBAPIKey('',cartodb_user)
-    carto_geoj = cl.sql("SELECT the_geom, cartodb_id FROM points WHERE cartodb_id=61", format='geojson')
-    carto_id = cl.sql("SELECT cartodb_id FROM points WHERE cartodb_id=61")
-    id = carto_id['rows'][0]['cartodb_id']
-    slug = id
-    
-    return render_template('welcome.html', carto_geoj=carto_geoj, id = id, slug = slug)
 
-@app.route('/story/<int:id>')
-def show_post(id):
-    # show the post with the given id, the id is an integer
-    return 'Post %d' % id  
 
 @app.route('/more')
 def update():
@@ -82,7 +67,23 @@ def update():
                    places=labels,
                    lastrowid=last_row_id)
 
-    
+@app.route('/<int:id>')
+def index_s(id):
+   cl = CartoDBAPIKey('',cartodb_user)
+   try:
+       carto_geoj = json.dumps(cl.sql("SELECT the_geom FROM points WHERE cartodb_id= %d;" % id , format='geojson'))
+       #TODO: Parse array of strings, not array of objects as place labels
+       labels_resp = cl.sql("SELECT pelias_label FROM points WHERE cartodb_id= %d;" % id)
+       labels = [[y for y in json.loads(x['pelias_label'])] for x in labels_resp['rows']]
+       last_row_id_resp = cl.sql("SELECT MAX(cartodb_id) AS id FROM points")
+       last_row_id = last_row_id_resp['rows'][0]['id']
+
+   except CartoDBException as e:
+       error = ("some error ocurred", e)
+   return render_template('index.html', 
+                          carto_geoj=carto_geoj, 
+                          carto_places=labels,
+                          last_row_id=last_row_id, error = error )   
  
 if __name__ == '__main__':
    app.run(debug=True)
