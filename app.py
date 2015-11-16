@@ -1,10 +1,12 @@
 from flask import Flask
 from flask import render_template
+from flask import views
 import os
 from flask import render_template, request, redirect, url_for, jsonify
 from cartodb import CartoDBAPIKey, CartoDBException
 import json 
-#import keys
+import keys
+
 
 app = Flask(__name__)
 cartodb_key = os.environ.get("cartodb_key")
@@ -14,7 +16,7 @@ cartodb_user= os.environ.get("cartodb_user")
 def index():
     cl = CartoDBAPIKey('',cartodb_user)
     try:
-        carto_geoj = json.dumps(cl.sql("SELECT the_geom FROM points WHERE cartodb_id=61", format='geojson'))
+        carto_geoj = cl.sql("SELECT the_geom FROM points WHERE cartodb_id=61", format='geojson')
 
         #TODO: Parse array of strings, not array of objects as place labels
         labels_resp = cl.sql("SELECT pelias_label FROM points WHERE cartodb_id=61;")
@@ -29,6 +31,7 @@ def index():
                            carto_geoj=carto_geoj, 
                            carto_places=labels,
                            last_row_id=last_row_id)
+                           
 
 @app.route('/geo', methods=['GET', 'POST'])
 def geodata():
@@ -42,6 +45,21 @@ def geodata():
     except CartoDBException as e:
         print("some error ocurred", e)
     return redirect(url_for('index'))
+
+@app.route('/welcome')
+def welcome():
+    cl = CartoDBAPIKey('',cartodb_user)
+    carto_geoj = cl.sql("SELECT the_geom, cartodb_id FROM points WHERE cartodb_id=61", format='geojson')
+    carto_id = cl.sql("SELECT cartodb_id FROM points WHERE cartodb_id=61")
+    id = carto_id['rows'][0]['cartodb_id']
+    slug = id
+    
+    return render_template('welcome.html', carto_geoj=carto_geoj, id = id, slug = slug)
+
+@app.route('/story/<int:id>')
+def show_post(id):
+    # show the post with the given id, the id is an integer
+    return 'Post %d' % id  
 
 @app.route('/more')
 def update():

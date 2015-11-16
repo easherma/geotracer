@@ -32,10 +32,10 @@ var geocoder_options = {position: 'topright',expanded: 'true', placeholder: 'Ent
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // Create one form for entering notes. We will show/hide the form and clear its text as needed.
-//var notesBoxControl = L.Control.extend({
-//    options: {
-//      position: 'bottomleft'
-//    },
+var notesBoxControl = L.Control.extend({
+    options: {
+      position: 'bottomleft'
+    },
     onAdd: function(map){
       this.container = $('<div/>')
         .attr('id','note-form')
