@@ -105,7 +105,7 @@ update_map();
 
 $(function() {
     var $control = $(".leaflet-pelias-control");
-    $control.prependTo("#input").css("color", "black");
+    $control.prependTo("#geocoder-input").css("color", "black");
 });
 
 /* ************ FUNCTIONS *********** */

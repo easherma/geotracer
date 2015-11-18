@@ -1,8 +1,6 @@
 div.story{
 	background: #337AB7;
 	width: 100vw;
-	height: 20vh;
-	z-index: 100;
 	color: white;
 	font-size: 3vh;
 	text-align: center;
@@ -12,4 +10,13 @@ div.story{
 section#map, div#map{
 	width: 100vw;
 	height: 50vh;
+	z-index: 50 !important;
+}
+
+div#geocoder-input{
+	background: orange;
+}
+
+div#geocoder-input input{
+	z-index: 200;
 }
