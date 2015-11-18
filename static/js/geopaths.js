@@ -24,7 +24,7 @@ var map = L.map('map', {
   inertia: false,
   minZoom: 2,
   continuousWorld: false,
-  layers: [confirmed_pts,user_layer_group,all_layer_group] //layers added here are shown by default
+  layers: [confirmed_pts,user_layer_group,all_layer_group] //layers added `re are shown by default
 }).setView([20, 0], 2);
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
