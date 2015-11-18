@@ -1,3 +1,7 @@
+html{
+  width: 100vw;
+}
+
 .hide {  
   display : none;
 }

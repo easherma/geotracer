@@ -5,13 +5,14 @@ div.story{
 	font-size: 3vh;
 	text-align: center;
 	padding: 3vh 0;
-	border-bottom: 10vh solid #337AB7;
+	border-bottom: 12vh solid #337AB7;
 }
 
 section#map, div#map{
 	width: 100vw;
 	height: 50vh;
 	z-index: 50 !important;
+	display: block;
 }
 
 div#geocoder-input{
@@ -20,8 +21,20 @@ div#geocoder-input{
 }
 
 div#geocoder-input div{
-	z-index: 200;
+	z-index: 200W0;
 	width: 80vw;
 	margin: 3vh 10vw;
 	position: relative;
+}
+
+div.leaflet-pelias-results{
+	background: orange;
+	border: none;
+	outline: none;
+}
+
+ul.leaflet-pelias-list{
+	margin: 0;
+	width: 200px;
+	height: 200px;
 }
