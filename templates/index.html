@@ -43,32 +43,11 @@
         <!-- Map -->
     <div class="story">
         <h2>Where were you born?</h2>
-        
-    </div>
-    <section id="map" class="map">
-        <div id='map' class='dark'></div>
-    <br>
-    
-    <br>
-    <p id="array-warn" style="color: red;"></p>
-    <script>
-      var geoj = {{carto_geoj|tojson}};
-    </script>
-    <script>
-      var geoplaces = {{ carto_places|tojson }}; 
-    </script>
-    <script>
-      var prevRowId = {{ last_row_id }};
-    </script>
-    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
-    </section>
-    <!-- Services -->
-    <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
-<div>
-<button type="button" class="btn btn-lg btn-dark" data-toggle="modal" data-target="#myModal" data-backdrop="false">Add My Story!</button>
+
+<!-- MOVED MODAL UP HERE -->
 
 <div class="modal" id="myModal">
-	<div class="modal-dialog">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -110,6 +89,34 @@
       </div>
     </div>
 </div>
+
+<!-- MOVED MODAL UP HERE -->
+
+    </div>
+    <section id="map" class="map">
+        <div id='map' class='dark'></div>
+    <br>
+    
+    <br>
+    <p id="array-warn" style="color: red;"></p>
+    <script>
+      var geoj = {{carto_geoj|tojson}};
+    </script>
+    <script>
+      var geoplaces = {{ carto_places|tojson }}; 
+    </script>
+    <script>
+      var prevRowId = {{ last_row_id }};
+    </script>
+    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
+    </section>
+    <!-- Services -->
+    <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
+<div>
+<button type="button" class="btn btn-lg btn-dark" data-toggle="modal" data-target="#myModal" data-backdrop="false">Add My Story!</button>
+
+<!-- MOVED MODAL FROM HERE -->
+
 </div>
 
     <section id="services" class="services bg-primary">
