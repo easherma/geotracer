@@ -1,10 +1,15 @@
-div.test{
+div.story{
 	background: #337AB7;
 	width: 100vw;
 	height: 20vh;
+	z-index: 100;
+	color: white;
+	font-size: 3vh;
+	text-align: center;
+	padding: 3vh 0;
 }
 
-div#map, section#map{
+section#map, div#map{
 	width: 100vw;
 	height: 50vh;
 }
