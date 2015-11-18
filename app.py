@@ -5,7 +5,7 @@ import os
 from flask import render_template, request, redirect, url_for, jsonify
 from cartodb import CartoDBAPIKey, CartoDBException
 import json 
-#import keys
+import keys
 
 
 app = Flask(__name__)
