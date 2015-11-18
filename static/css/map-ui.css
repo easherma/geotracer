@@ -17,6 +17,8 @@ div#geocoder-input{
 	background: orange;
 }
 
-div#geocoder-input input{
+div#geocoder-input div{
 	z-index: 200;
+	position: relative;
+	margin: 400px;
 }
