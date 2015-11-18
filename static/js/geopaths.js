@@ -17,6 +17,7 @@ var user_layer_group = L.layerGroup();
 //We will add paths to the group as they are retrieved from the db.
 var all_layer_group = L.featureGroup();
 
+
 // Show the whole world in this first view.
 var map = L.map('map', {
   bounceAtZoomLimits: true,
@@ -103,6 +104,7 @@ update_map();
 //commented out while front end is in flux
 //document.getElementById("submit_button").addEventListener("click", post_array);
 
+//move pelias to dialog box
 $(function() {
     var $control = $(".leaflet-pelias-control");
     $control.prependTo("#input").css("color", "black");
@@ -116,7 +118,7 @@ function geoJSONToLLatLng(ptStr) {
   var p = JSON.parse(ptStr);
   return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
-//randomcolors
+//random colors
 function getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
@@ -217,6 +219,7 @@ function single_drawMultipoints(multipoints,places,layer,bring_to_back){
       layer.bringToBack();
     } else {
       // Run animation on the new route
+	  
       route.snakeIn();
     }
   });
@@ -240,7 +243,7 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     })(firstMarker);
     var route = L.featureGroup([firstMarker]);
     for (var j = 1; j < coords.length; j ++){
-      var poly = L.polyline([coords[j-1],coords[j]], {color:color, opacity: j * .1 });
+      var poly = L.polyline([coords[j-1],coords[j]], {color:color, opacity: j * .3 });
       (function(layer){
         layer.on('mouseover',function(e){
           layer.setStyle(biggerLine);
@@ -254,7 +257,11 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
       route.addLayer(poly)
       var nextMarker = L.circleMarker(coords[j],{radius:2,color:color,title:places[i][j].place,note:places[i][j].note});
       (function(layer){
-        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseover',function(e) {
+		e.layer.openPopup();
+		});
+		
+		//{addTooltip(e,{'type':'place','txt':layer.options.title});});
         layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
       })(nextMarker);
       route.addLayer(nextMarker);
@@ -268,6 +275,8 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
       layer.bringToBack();
     } else {
       // Run animation on the new route
+	  map.fitBounds(all_layer_group.getBounds(),{
+	  padding: [25,25]});
       route.snakeIn();
     }
   });
