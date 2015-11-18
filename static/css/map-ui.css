@@ -1,5 +1,10 @@
 div.test{
-	background: orange;
+	background: #337AB7;
 	width: 100vw;
 	height: 20vh;
+}
+
+div#map, section#map{
+	width: 100vw;
+	height: 50vh;
 }
