@@ -27,7 +27,7 @@ var map = L.map('map', {
   continuousWorld: false,
   layers: [confirmed_pts,user_layer_group,all_layer_group] //layers added here are shown by default
 }).setView([20, 0], 2);
-L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.tileLayer('https://a.tiles.mapbox.com/v3/mapbox.world-bright/{z}/{x}/{y}.png').addTo(map);
 
 var geocoder_options = {position: 'topright',expanded: 'true', placeholder: 'Enter your points here!', title: 'Enter your points here!'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
