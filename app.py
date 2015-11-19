@@ -90,7 +90,7 @@ def update():
 def index_s(id):
    cl = CartoDBAPIKey('',cartodb_user)
    try:
-       carto_geoj = json.dumps(cl.sql("SELECT the_geom FROM points WHERE cartodb_id= %d;" % id , format='geojson'))
+       carto_geoj = json.dumps(cl.sql("SELECT * FROM points WHERE cartodb_id= %d;" % id , format='geojson'))
        #TODO: Parse array of strings, not array of objects as place labels
        labels_resp = cl.sql("SELECT pelias_label FROM points WHERE cartodb_id= %d;" % id)
        labels = [[y for y in json.loads(x['pelias_label'])] for x in labels_resp['rows']]
