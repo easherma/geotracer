@@ -35,7 +35,7 @@ def index():
 def all():
     cl = CartoDBAPIKey('',cartodb_user)
     try:
-        carto_geoj = cl.sql("SELECT the_geom FROM points;", format='geojson')
+        carto_geoj = cl.sql("SELECT * FROM points;", format='geojson')
         id = "All"
         #TODO: Parse array of strings, not array of objects as place labels
         labels_resp = cl.sql("SELECT pelias_label FROM points ")

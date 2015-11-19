@@ -15,7 +15,10 @@ var user_layer_group = L.layerGroup();
 
 //Create grouping of all paths.
 //We will add paths to the group as they are retrieved from the db.
-var all_layer_group = L.featureGroup();
+var all_layer_group = L.featureGroup()
+    .bindPopup('Hello world!')
+    .on('mouseover', function() { all_layer_group.setStyle(biggerLine) })
+    .on('mouseout', function() { all_layer_group.setStyle(normalLine) }); 
 
 
 // Show the whole world in this first view.
@@ -112,11 +115,6 @@ $(function() {
 
 /* ************ FUNCTIONS *********** */
 
-// Transform a GeoJSON string '{type:"Point",coordinates:[x,y]}'
-//  into a leaflet LatLng object  */
-function geoJSONToLLatLng(ptStr) {
-  var p = JSON.parse(ptStr);
-  return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
 //random colors
 function getRandomColor() {
@@ -154,7 +152,7 @@ function update_map() {
 
 // Add array of Multipoint geoJSON features to a layer and animate.
 // Each multipoint represents a different 'story' line
-function single_drawMultipoints(multipoints,places,layer,bring_to_back){
+/*function single_drawMultipoints(multipoints,places,layer,bring_to_back){
 
   multipoints.forEach(function(mp,i){
     // Transform coordinate pairs from Lng,Lat to Lat,Lng
@@ -224,6 +222,7 @@ function single_drawMultipoints(multipoints,places,layer,bring_to_back){
     }
   });
 }
+*/
 
 function drawMultipoints(multipoints,places,layer,bring_to_back){
 
@@ -241,26 +240,29 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
       layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
       layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
     })(firstMarker);
+    /* label pop-ups
+    var plabel = places[i][0].place
+	var popup = L.popup()
+    .setLatLng(coords[0])
+    .setContent(plabel)
+    .addTo(map); */
     var route = L.featureGroup([firstMarker]);
     for (var j = 1; j < coords.length; j ++){
       var poly = L.polyline([coords[j-1],coords[j]], {color:color, opacity: j * .3 });
-      (function(layer){
-        layer.on('mouseover',function(e){
-          layer.setStyle(biggerLine);
-          addTooltip(e,{'type':'note','grandlayergroup':all_layer_group,'thislayer':layer});
-        });
-        layer.on('mouseout',function(){
-          layer.setStyle(normalLine);
-          removeTooltip({'type':'note'});
-        });
-      })(poly);
+        (poly);
       route.addLayer(poly)
       var nextMarker = L.circleMarker(coords[j],{radius:2,color:color,title:places[i][j].place,note:places[i][j].note});
       (function(layer){
         layer.on('mouseover',function(e) {
 		e.layer.openPopup();
 		});
-		
+    /*label popups
+    var plabel1 = places[i][j].place
+	var popup1 = L.popup()
+		.setLatLng(coords[j])
+		.setContent(plabel1)
+		.addTo(map);
+	*/	
 		//{addTooltip(e,{'type':'place','txt':layer.options.title});});
         layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
       })(nextMarker);
