@@ -16,7 +16,7 @@ var user_layer_group = L.layerGroup();
 //Create grouping of all paths.
 //We will add paths to the group as they are retrieved from the db.
 var all_layer_group = L.featureGroup()
-    .bindPopup('Hello world!')
+    .bindPopup(''+ JSON.parse(geoj).features[0].properties.pelias_label)
     .on('mouseover', function() { all_layer_group.setStyle(biggerLine) })
     .on('mouseout', function() { all_layer_group.setStyle(normalLine) }); 
 

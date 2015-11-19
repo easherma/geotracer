@@ -16,7 +16,7 @@ cartodb_user= os.environ.get("cartodb_user")
 def index():
     cl = CartoDBAPIKey('',cartodb_user)
     try:
-        carto_geoj = cl.sql("SELECT the_geom, cartodb_id FROM points ORDER BY random() LIMIT 1;", format='geojson')
+        carto_geoj = cl.sql("SELECT * FROM points ORDER BY random() LIMIT 1;", format='geojson')
         id = carto_geoj['features'][0]['properties']['cartodb_id']
         #TODO: Parse array of strings, not array of objects as place labels
         labels_resp = cl.sql("SELECT pelias_label FROM points WHERE cartodb_id = %s ;" % id)
