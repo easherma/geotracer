@@ -22,6 +22,7 @@ nav#sidebar-wrapper{
 /*--------------------------------------------*/
 
 div.story{
+
 	background: @mapBlue;
 	width: 100vw;
 	color: white;
@@ -33,7 +34,25 @@ div.story{
 	 * positioned div is inside it...
 	 * It's a bold strategy, Cotton, let's see if it pays off for him.
 	 */
-	border-bottom: 12vh solid @mapBlue;
+	//border-bottom: 12vh solid @mapBlue;
+
+	button{
+
+		background: red;
+		border: none;
+		outline: none;
+
+		span{
+			font-size: 3vh;
+			
+			 &:before{
+				content: " ";
+			}
+
+		}
+
+	}
+
 }
 
 section#map, div#map{
