@@ -1,6 +1,7 @@
 function revealTextarea(divID, textID, placeholderText){
 	var placeholder = placeholderText || "Enter a note here.";
 	document.getElementById(textID).value = placeholder;
+	$('#' + divID).removeClass('invisible');
 	$('#' + divID).addClass('visible');
 }
 
