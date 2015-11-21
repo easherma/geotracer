@@ -7,7 +7,9 @@ function revealTextarea(id, placeholderText){
 function addTextToPoint(coordPair, place){
 	console.log("PLACE:");
 	console.log(place);
-	revealTextarea('text-map-addition');
+	var message = "Tell us more about " + place.name;
+		message += ", " + place.region + ", " + place.country + "!";
+	revealTextarea('text-map-addition', message);
 }
 
 console.log("LOADED map-ui-scripts.js");
