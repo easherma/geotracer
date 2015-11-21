@@ -41,7 +41,7 @@ div.story{
 		background: red;
 	}
 
-	button#submit-map-addition{
+	button#submit-map-addition, button#note-map-addition{
 		background: green;
 	}
 
@@ -128,6 +128,14 @@ div#geocoder-input{
 
 div.story{
 
+	div.visible{
+		display: block;
+	}
+
+	div#note-submission{
+		display: none;
+	}
+
 	textarea{
 		color: @charcoal;
 		border: none;
@@ -135,11 +143,10 @@ div.story{
 		width: 76%;
 		padding: 2%;
 		margin: 1.5vh 10%;
-		display: none;
 	}
 
-	textarea.visible{
-		display: block;
+	button#note-map-addition{
+		width: 42vw;
 	}
 
 }

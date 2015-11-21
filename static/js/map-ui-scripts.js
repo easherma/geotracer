@@ -1,7 +1,7 @@
-function revealTextarea(id, placeholderText){
+function revealTextarea(divID, textID, placeholderText){
 	var placeholder = placeholderText || "Enter a note here.";
-	document.getElementById(id).value = placeholder;
-	$('#' + id).addClass('visible');
+	document.getElementById(textID).value = placeholder;
+	$('#' + divID).addClass('visible');
 }
 
 function addTextToPoint(coordPair, place){
@@ -9,7 +9,7 @@ function addTextToPoint(coordPair, place){
 	console.log(place);
 	var message = "Tell us more about " + place.name;
 		message += ", " + place.region + ", " + place.country + "!";
-	revealTextarea('text-map-addition', message);
+	revealTextarea('note-submission', 'text-map-addition', message);
 }
 
 console.log("LOADED map-ui-scripts.js");
