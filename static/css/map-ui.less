@@ -39,6 +39,11 @@ div#geocoder-input{
 
 	width: 100vw;
 
+	div{
+		//Catch all divs inside the wrapper and lay them over the map
+		z-index: 2010;
+	}
+
 	/* CLASSES IN SEARCH BOX WRAPPER DIV:
 	 * What to do with these?
 	 * .leaflet-pelias-control,
@@ -48,6 +53,11 @@ div#geocoder-input{
 	 * .leaflet-control,
 	 * .leaflet-pelias-expanded
 	 */
+
+	.leaflet-bar{
+		width: 80%;
+		margin: 2vh 10%;
+	}
 
 	input.leaflet-pelias-input{
 
@@ -62,7 +72,7 @@ div#geocoder-input{
 	}
 
 	div.leaflet-pelias-results{
-
+		margin-top: 7vh;
 	}
 
 
