@@ -3,6 +3,7 @@
 /*--------------------------------------------*/
 
 @mapBlue: #337AB7;
+@charcoal: #1A1A1A;
 
 /*--------------------------------------------*/
 /*---> LAYERING <-----------------------------*/
@@ -75,6 +76,10 @@ section#map, div#map{
 	display: block;
 }
 
+/*--------------------------------------------*/
+/*---> GEOCODER COMBOBOX <--------------------*/
+/*--------------------------------------------*/
+
 div#geocoder-input{
 
 	width: 100vw;
@@ -117,6 +122,25 @@ div#geocoder-input{
 
 }
 
+/*--------------------------------------------*/
+/*---> STORY TEXT <---------------------------*/
+/*--------------------------------------------*/
+
+div.story{
+
+	textarea{
+		color: @charcoal;
+		border: none;
+		outline: none;
+		margin: 1.5vh;
+	}
+
+}
+
+/*--------------------------------------------*/
+/*---> POPUPS <-------------------------------*/
+/*--------------------------------------------*/
+
 div.leaflet-popup{
 
 	div.leaflet-popup-content{
@@ -147,30 +171,6 @@ div.leaflet-popup{
 	}
 
 }
-
-/*div#geocoder-input{
-	width: 100vw;
-	background: orange;
-}
-
-div#geocoder-input div{
-	z-index: 2000;
-	width: 80vw;
-	margin: 3vh 10vw;
-	position: relative;
-}
-
-div.leaflet-pelias-results{
-	background: orange;
-	border: none;
-	outline: none;
-}
-
-ul.leaflet-pelias-list{
-	margin: 0;
-	width: 200px;
-	height: 200px;
-}*/
 
 /*--------------------------------------------*/
 /*---> SCROLLBAR <----------------------------*/
