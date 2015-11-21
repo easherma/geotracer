@@ -274,9 +274,11 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
 }
 
 
-
 //Handle user clicking 'Confirm' button.
 function confirmCoord(coordPair,place) {
+
+  //ADDED BY VINESH
+  addTextToPoint(coordPair, place);
 
   //Show confirmation
   var confirmation_msg = document.createElement('div');
