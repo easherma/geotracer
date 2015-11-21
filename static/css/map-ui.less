@@ -20,6 +20,11 @@ div.story{
 	font-size: 3vh;
 	text-align: center;
 	padding: 3vh 0;
+	/*
+	 * Using a border to extend the div so it looks like an absolutely
+	 * positioned div is inside it...
+	 * It's a bold strategy, Cotton, let's see if it pays off for him.
+	 */
 	border-bottom: 12vh solid @mapBlue;
 }
 
@@ -31,6 +36,8 @@ section#map, div#map{
 }
 
 div#geocoder-input{
+
+	width: 100vw;
 
 	/* CLASSES IN SEARCH BOX WRAPPER DIV:
 	 * What to do with these?
