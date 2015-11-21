@@ -1,16 +1,26 @@
+/*--------------------------------------------*/
+/*---> GLOBALS <------------------------------*/
+/*--------------------------------------------*/
+
+@mapBlue: #337AB7;
+
+/*--------------------------------------------*/
+/*---> MAP UI <-------------------------------*/
+/*--------------------------------------------*/
+
 a#menu-toggle{
 	position: fixed;
 	z-index: 2000;
 }
 
 div.story{
-	background: #337AB7;
+	background: @mapBlue;
 	width: 100vw;
 	color: white;
 	font-size: 3vh;
 	text-align: center;
 	padding: 3vh 0;
-	border-bottom: 12vh solid #337AB7;
+	border-bottom: 12vh solid @mapBlue;
 }
 
 section#map, div#map{
@@ -42,4 +52,47 @@ ul.leaflet-pelias-list{
 	margin: 0;
 	width: 200px;
 	height: 200px;
+}
+
+/*--------------------------------------------*/
+/*---> SCROLLBAR <----------------------------*/
+/*--------------------------------------------*/
+
+@scrollBar: @mapBlue;
+@scrollBarBack: white;
+
+::-webkit-scrollbar{
+	width: 10px;
+	height: 10px;
+	background: @scrollBarBack;
+	z-index: 50;
+}
+
+::-webkit-scrollbar-button{
+	background: @scrollBarBack;
+}
+
+::-webkit-scrollbar-track{
+	background: @scrollBarBack;
+}
+
+::-webkit-scrollbar-track-piece{
+	background: @scrollBarBack;
+}
+
+::-webkit-scrollbar-thumb{
+	background: @scrollBar;
+	border-radius: 5px;
+	position: absolute;
+	margin-left: -10px;
+}
+
+::-webkit-scrollbar-corner{
+	width: 10px;
+	height: 10px;
+	background: @scrollBarBack;
+}
+
+::-webkit-resizer{
+	background: @scrollBarBack;
 }
