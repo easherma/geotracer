@@ -3,8 +3,8 @@
 // Declare global variables
 var UPDATE_INTERVAL = 30000; //unis of ms
 var geocoderResults; //Referenced in Pelias js 
-var biggerLine = {weight:10,lineCap:'butt'};
-var normalLine = {weight:4,lineCap:'round'};
+var biggerLine = {weight:8,lineCap:'butt'};
+var normalLine = {weight:2.5,lineCap:'round'};
 var title = "Title"
 
 //Create groupings for user-submitted results.
@@ -116,7 +116,15 @@ function geoJSONToLLatLng(ptStr) {
   var p = JSON.parse(ptStr);
   return new L.LatLng(p.coordinates[1],p.coordinates[0]);
 }
-
+//randomcolors
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 //Gets new rows from the server and plots them.
 // Executes periodically and indefinitely until server returns an error.
@@ -144,7 +152,7 @@ function update_map() {
 
 // Add array of Multipoint geoJSON features to a layer and animate.
 // Each multipoint represents a different 'story' line
-function drawMultipoints(multipoints,places,layer,bring_to_back){
+function single_drawMultipoints(multipoints,places,layer,bring_to_back){
 
   multipoints.forEach(function(mp,i){
     // Transform coordinate pairs from Lng,Lat to Lat,Lng
@@ -153,16 +161,28 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     // Reverse coordinates and places so animation happens in chronological order
     coords.reverse();
     places[i].reverse();
+	color = getRandomColor()
 
-    // Transform multipoint to featuregroup of alternating points and line segments.
-    var firstMarker = L.circleMarker(coords[0],{radius:6,title:places[i][0].place,note:places[i][0].note});
+    // Transform multipoint to featuregroup of alternating points and line segments. style 
+    var firstMarker = L.circleMarker(coords[0],{color: color, radius:2,}, {title:places[i][0].place,note:places[i][0].note});
+	map.eachLayer(function (layer) {
+    layer.bindPopup('Hello');
+});
+
+
     (function(layer){
       layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
       layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
     })(firstMarker);
+	var plabel = places[i][0].place
+	var popup = L.popup()
+    .setLatLng(coords[0])
+    .setContent(plabel)
+    .addTo(map);
     var route = L.featureGroup([firstMarker]);
     for (var j = 1; j < coords.length; j ++){
-      var poly = L.polyline([coords[j-1],coords[j]]);
+      var poly = L.polyline([coords[j-1],coords[j]], {color: color});
+	  
       (function(layer){
         layer.on('mouseover',function(e){
           layer.setStyle(biggerLine);
@@ -174,7 +194,65 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
         });
       })(poly);
       route.addLayer(poly)
-      var nextMarker = L.circleMarker(coords[j],{radius:6,title:places[i][j].place,note:places[i][j].note});
+      var nextMarker = L.circleMarker(coords[j],{color: color, radius:2,},{radius:.2,title:places[i][j].place,note:places[i][j].note});
+	var plabel1 = places[i][j].place
+	var popup1 = L.popup()
+		.setLatLng(coords[j])
+		.setContent(plabel1)
+		.addTo(map);
+
+      (function(layer){
+        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+      })(nextMarker);
+      route.addLayer(nextMarker);
+    }
+
+      
+    // Add featuregroup to specified layer
+    layer.addLayer(route);
+
+    if (bring_to_back) {
+      // Send layer group to bottom. And don't animate (which brings it to fore.)
+      layer.bringToBack();
+    } else {
+      // Run animation on the new route
+      route.snakeIn();
+    }
+  });
+}
+
+function drawMultipoints(multipoints,places,layer,bring_to_back){
+
+  multipoints.forEach(function(mp,i){
+    // Transform coordinate pairs from Lng,Lat to Lat,Lng
+    var coords = mp.geometry.coordinates.map(function(p){return p.reverse();});
+	color = getRandomColor()
+    // Reverse coordinates and places so animation happens in chronological order
+    coords.reverse();
+    places[i].reverse();
+
+    // Transform multipoint to featuregroup of alternating points and line segments.
+    var firstMarker = L.circleMarker(coords[0],{radius:2,color:color,title:places[i][0].place,note:places[i][0].note});
+    (function(layer){
+      layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+      layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
+    })(firstMarker);
+    var route = L.featureGroup([firstMarker]);
+    for (var j = 1; j < coords.length; j ++){
+      var poly = L.polyline([coords[j-1],coords[j]], {color:color, opacity: j * .1 });
+      (function(layer){
+        layer.on('mouseover',function(e){
+          layer.setStyle(biggerLine);
+          addTooltip(e,{'type':'note','grandlayergroup':all_layer_group,'thislayer':layer});
+        });
+        layer.on('mouseout',function(){
+          layer.setStyle(normalLine);
+          removeTooltip({'type':'note'});
+        });
+      })(poly);
+      route.addLayer(poly)
+      var nextMarker = L.circleMarker(coords[j],{radius:2,color:color,title:places[i][j].place,note:places[i][j].note});
       (function(layer){
         layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
         layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
@@ -194,6 +272,8 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     }
   });
 }
+
+
 
 //Handle user clicking 'Confirm' button.
 function confirmCoord(coordPair,place) {
