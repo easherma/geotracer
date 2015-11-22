@@ -142,7 +142,7 @@ L.Polyline.include({
 
 
 L.Polyline.mergeOptions({
-	snakingSpeed: 200	// In pixels/sec
+	snakingSpeed: 275	// In pixels/sec
 });
 
 

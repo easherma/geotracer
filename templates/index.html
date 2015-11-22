@@ -25,6 +25,11 @@
             </li>
         </ul>
     </nav>
+        <script>
+        var title = "Where do you live?";
+        document.getElementsByClassName("modal-title").innerHTML = "Where do you live?"; 
+        
+        </script>
 
     <!-- Header -->
     <header id="top" class="header">
@@ -32,13 +37,80 @@
             <h1>GeoTracer:</h1>
             <h3>Interactive, Crowd-Sourced Migration Map</h3>
             <br>
-            <a href="#services" class="btn btn-dark btn-lg">Add Your Story!</a>
+			<h3>Map#: {{id}}</h3>
+           <!-- <a href="#services" class="btn btn-dark btn-lg">Add Your Story!</a> -->
         </div>
     </header>
+        <!-- Map -->
+    <section id="map" class="map">
+        <div id='map' class='dark'></div>
+    <br>
+    
+    <br>
+    <p id="array-warn" style="color: red;"></p>
+    <script>
+      var geoj = {{carto_geoj|tojson}};
+    </script>
+    <script>
+      var geoplaces = {{ carto_places|tojson }}; 
+    </script>
+    <script>
+      var prevRowId = {{ last_row_id }};
+    </script>
+    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
+    </section>
     <!-- Services -->
     <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
+<div>
+<button type="button" class="btn btn-lg btn-dark" data-toggle="modal" data-target="#myModal" data-backdrop="false">Add My Story!</button>
+
+<div class="modal" id="myModal">
+	<div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title">Modal title</h4>
+        </div><div class="container"></div>
+        <div class="modal-body" id='input'>
+          <div class="container" id="form">
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="inputfield1" class="col-sm-2 control-label">Input 1</label>
+            <div class="col-sm-10" id="input">
+              
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="inputfield2" class="col-sm-2 control-label">Input 2</label>
+            <div class="col-sm-10 controls">
+              <div class="input-group">
+                <input type="text" class="form-control" id="inputfield2" placeholder="Input 2">
+                <span class="input-group-addon">.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputfield3" class="col-sm-2 control-label">Input 3</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="inputfield3" placeholder="Input 3">
+            </div>
+          </div>      
+        </form>
+    </div>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal2">Open Modal</button>
+        </div>
+        <div class="modal-footer">
+          <a href="#" data-dismiss="modal" class="btn">Close</a>
+          <a href="#" class="btn btn-primary">Save changes</a>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
     <section id="services" class="services bg-primary">
-        <div class="container">
+    
             <div class="row text-left">
                 <div class="col-lg-10 col-lg-offset-1">
                     <h2>How to add and trace your story:</h2>
@@ -50,74 +122,6 @@
 <li>Add an optional note about you or your trace, for others to see.</li>
 </ol>
 <p>Once you submit your locations, we'll trace them on the map, where you can also see other people's family histories.</p></span>
-                    <div class="row hidden">
-                        <div class="col-md-2 col-sm-6">
-                            <div class="service-item">
-                                <span class="fa-stack fa-4x">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-arrow-circle-right fa-stack-1x text-primary"></i>
-                            </span>
-                                <h4>
-                                    <strong>Where do you live?</strong>
-                                </h4>
-                                <p>Our house, in the middle of our street.</p>
-                                <button id="submit_button">Submit</button> 
-                            </div>
-                        </div>
-						
-                        <div class="col-md-3 col-sm-6">
-                            <div class="service-item">
-                                <span class="fa-stack fa-4x">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-arrow-circle-right fa-stack-1x text-primary"></i>
-                            </span>
-                                <h4>
-                                    <strong>Where did you grow up?</strong>
-                                </h4>
-                                <p>In west Philadelphia born and raised, On the playground was where I spent most of my days.</p>
-                                <!--<button id="submit_button2">Submit</button>-->
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-sm-6">
-                            <div class="service-item">
-                                <span class="fa-stack fa-4x">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-arrow-circle-right fa-stack-1x text-primary"></i>
-                            </span>
-                                <h4>
-                                    <strong>Where are one of your parents from?</strong>
-                                </h4>
-                                <p>Who is your daddy and what does he do?</p>
-                                <!--<a href="#" class="btn btn-light">Learn More</a>-->
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="service-item">
-                                <span class="fa-stack fa-4x">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-arrow-circle-right fa-stack-1x text-primary"></i>
-                            </span>
-                                <h4>
-                                    <strong>What about a grand-parent?</strong>
-                                </h4>
-                                <p>Nothing funny about grandparents. </p>
-                                <!--<a href="#" class="btn btn-light">Learn More</a>-->
-                            </div>
-                        </div>
-						<div class="col-md-2 col-sm-6">
-                            <div class="service-item">
-                                <span class="fa-stack fa-4x">
-                                <i class="fa fa-circle fa-stack-2x"></i>
-                                <i class="fa fa-arrow-circle-right fa-stack-1x text-primary"></i>
-                            </span>
-                                <h4>
-                                    <strong>What about a great-grand-parent?</strong>
-                                </h4>
-                                <p>Nothing funny about grandparents. </p>
-                                <!--<a href="#" class="btn btn-light">Learn More</a>-->
-                            </div>
-                        </div>
-                    </div>
                     <!-- /.row (nested) -->
                 </div>
                 <!-- /.col-lg-10 -->
@@ -137,20 +141,7 @@
             </div>
         </div>
     </aside>
-    <!-- Map -->
-    <section id="map" class="map">
-        <div id='map' class='dark'></div>
-    <br>
-    
-    <br>
-    <p id="array-warn" style="color: red;"></p>
-    <script>
-      var geoj = {{carto_geoj|tojson}};
-      var geoplaces = {{ carto_places|tojson }}; 
-      var prevRowId = {{ last_row_id }};
-    </script>
-    <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
-    </section>
+
 
     <!-- About -->
     <section id="about" class="about">
