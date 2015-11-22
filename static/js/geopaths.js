@@ -107,11 +107,13 @@ update_map();
 //commented out while front end is in flux
 //document.getElementById("submit_button").addEventListener("click", post_array);
 
-//move pelias to dialog box
+//move pelias to dialog box, disabled for now until UI is redone
+/*
 $(function() {
     var $control = $(".leaflet-pelias-control");
     $control.prependTo("#input").css("color", "black");
 });
+*/
 
 /* ************ FUNCTIONS *********** */
 
