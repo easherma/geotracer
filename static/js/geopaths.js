@@ -3,8 +3,8 @@
 // Declare global variables
 var UPDATE_INTERVAL = 30000; //unis of ms
 var geocoderResults; //Referenced in Pelias js 
-var biggerLine = {weight:8,lineCap:'butt'};
-var normalLine = {weight:2.5,lineCap:'round'};
+var biggerLine = {weight:6,lineCap:'butt'};
+var normalLine = {weight:2.4,lineCap:'butt'};
 var title = "Title"
 
 //Create groupings for user-submitted results.
@@ -18,7 +18,7 @@ var user_layer_group = L.layerGroup();
 var all_layer_group = L.featureGroup()
     .bindPopup(''+ JSON.parse(geoj).features[0].properties.pelias_label)
     .on('mouseover', function() { all_layer_group.setStyle(biggerLine) })
-    .on('mouseout', function() { all_layer_group.setStyle(normalLine) }); 
+    .on('mouseout', function() { all_layer_group.setStyle( normalLine ) }); 
 
 
 // Show the whole world in this first view.
@@ -123,7 +123,7 @@ function getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
     for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * 14)];
     }
     return color;
 }
@@ -237,7 +237,7 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     places[i].reverse();
 
     // Transform multipoint to featuregroup of alternating points and line segments.
-    var firstMarker = L.circleMarker(coords[0],{radius:2,color:color,title:places[i][0].place,note:places[i][0].note});
+    var firstMarker = L.circleMarker(coords[0],{radius:2,color:color, opacity: 0, title:places[i][0].place,note:places[i][0].note});
     (function(layer){
       layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
       layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
@@ -250,10 +250,10 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     .addTo(map); */
     var route = L.featureGroup([firstMarker]);
     for (var j = 1; j < coords.length; j ++){
-      var poly = L.polyline([coords[j-1],coords[j]], {color:color, opacity: j * .3 });
+      var poly = L.polyline([coords[j-1],coords[j]], {color:color, opacity: j * .2 , weight: j * 1.5 });
         (poly);
       route.addLayer(poly)
-      var nextMarker = L.circleMarker(coords[j],{radius:2,color:color,title:places[i][j].place,note:places[i][j].note});
+      var nextMarker = L.circleMarker(coords[j],{radius:j * 1.2,color:color,opacity: j * .2, title:places[i][j].place,note:places[i][j].note});
       (function(layer){
         layer.on('mouseover',function(e) {
 		e.layer.openPopup();
@@ -442,7 +442,7 @@ function submit(){
     post();
     // Collect points into path and animate
     var latlngs = confirmed_pts.getLayers().reverse().map(function(d){return d.getLatLng();});
-    var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:200});
+    var confirmed_poly = L.polyline(latlngs,{color:"yellow",snakingSpeed:400});
     // For setting hover styles, auto-invoked function recommended by:
     // http://palewi.re/posts/2012/03/26/leaflet-recipe-hover-events-features-and-polygons/ 
     (function(layer,noteText){
