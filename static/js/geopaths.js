@@ -321,6 +321,7 @@ function addClearThisBtn(confirmed_mark){
   var oldPopup = geocoder.marker.getPopup().getContent();
   var clearBtn = document.createElement('button');
   var confirmedLatLng = confirmed_mark.getLatLng();
+  clearBtn.id = "clearOne";
   clearBtn.className = "btn btn-default btn-sm";
   clearBtn.innerHTML = "Clear this point";
   clearBtn.addEventListener('click',function(){
@@ -343,6 +344,7 @@ function addClearAllBtn(confirmed_mark){
   var oldPopup = geocoder.marker.getPopup().getContent();
   var clearBtn = document.createElement('button');
   var confirmedLatLng = confirmed_mark.getLatLng();
+  clearBtn.id = "clearAll";
   clearBtn.className = "btn btn-default btn-sm";
   clearBtn.innerHTML = "Clear all points";
   clearBtn.addEventListener('click',function(){
@@ -361,6 +363,7 @@ function addNext(confirmed_mark){
   var oldPopup = geocoder.marker.getPopup().getContent();
   var clearBtn = document.createElement('button');
   var confirmedLatLng = confirmed_mark.getLatLng();
+  clearBtn.id = "next";
   clearBtn.className = "btn btn-default btn-sm";
   clearBtn.innerHTML = "Enter More Points";
   clearBtn.addEventListener('click',function(){
