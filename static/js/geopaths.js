@@ -306,6 +306,7 @@ function confirmCoord(coordPair,place) {
   addNext(confirmed_mark);
   addClearThisBtn(confirmed_mark);
   addClearAllBtn(confirmed_mark);
+  addNotes(confirmed_mark);
   
   geocoder.marker.unbindPopup();
   
@@ -322,7 +323,7 @@ function addClearThisBtn(confirmed_mark){
   var clearBtn = document.createElement('button');
   var confirmedLatLng = confirmed_mark.getLatLng();
   clearBtn.id = "clearOne";
-  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.className = "btn btn-dark btn-sm";
   clearBtn.innerHTML = "Clear this point";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
@@ -345,7 +346,7 @@ function addClearAllBtn(confirmed_mark){
   var clearBtn = document.createElement('button');
   var confirmedLatLng = confirmed_mark.getLatLng();
   clearBtn.id = "clearAll";
-  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.className = "btn btn-dark btn-sm";
   clearBtn.innerHTML = "Clear all points";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
@@ -364,7 +365,7 @@ function addNext(confirmed_mark){
   var clearBtn = document.createElement('button');
   var confirmedLatLng = confirmed_mark.getLatLng();
   clearBtn.id = "next";
-  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.className = "btn btn-dark btn-sm";
   clearBtn.innerHTML = "Enter More Points";
   clearBtn.addEventListener('click',function(){
     //Prevent doubletap
@@ -374,13 +375,32 @@ function addNext(confirmed_mark){
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 } 
 
+function addNotes(confirmed_mark){
+  var oldPopup = geocoder.marker.getPopup().getContent();
+  var clearBtn = document.createElement('button');
+  var confirmedLatLng = confirmed_mark.getLatLng();
+  clearBtn.id = "notes";
+  clearBtn.className = "btn btn-dark btn-sm";
+  clearBtn.innerHTML = "Add Notes";
+  clearBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    notesBox.show();
+    $(function() {
+    var $control = $("#note-form");
+    $control.appendTo(".leaflet-popup-content");
+});
+  });
+  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+} 
+
+
 function clearAll(){
   confirmed_pts.clearLayers(); 
 }
 
 function addSubmitBtn(confirmed_mark){
   var submitBtn = document.createElement('a');
-  submitBtn.className = "btn btn-default";
+  submitBtn.className = "btn btn-dark btn-sm";
   submitBtn.innerHTML = "Done";
   submitBtn.addEventListener('click',function(){
     //Prevent doubletap
