@@ -237,7 +237,7 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
     places[i].reverse();
 
     // Transform multipoint to featuregroup of alternating points and line segments.
-    var firstMarker = L.circleMarker(coords[0],{radius:2,color:color, opacity: 0, title:places[i][0].place,note:places[i][0].note});
+    var firstMarker = L.circleMarker(coords[0],{radius:2,color:color, opacity: 0});
     (function(layer){
       layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
       layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
@@ -253,7 +253,7 @@ function drawMultipoints(multipoints,places,layer,bring_to_back){
       var poly = L.polyline([coords[j-1],coords[j]], {color:color, opacity: j * .2 , weight: j * 1.5 });
         (poly);
       route.addLayer(poly)
-      var nextMarker = L.circleMarker(coords[j],{radius:j * 1.2,color:color,opacity: j * .2, title:places[i][j].place,note:places[i][j].note});
+      var nextMarker = L.circleMarker(coords[j],{radius:j * 1.2,color:color,opacity: j * .2});
       (function(layer){
         layer.on('mouseover',function(e) {
 		e.layer.openPopup();
