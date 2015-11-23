@@ -463,7 +463,7 @@
           }
         }, this)
         .on(this._close, 'click', function (e) {
-          this.resetInput();
+          this.Input();
           this.clearResults();
           L.DomEvent.stopPropagation(e);
         }, this)

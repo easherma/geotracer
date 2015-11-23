@@ -80,7 +80,12 @@ hr.small {
     -o-transition: all 0.4s ease 0s;
     transition: all 0.4s ease 0s;
 }
-
+.popup{
+    right: 0;
+    width: 250px;
+    height: 100%;
+    margin-right: -250px;
+}
 .sidebar-nav {
     position: absolute;
     top: 0;

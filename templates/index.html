@@ -37,8 +37,12 @@
             <h1>Map My Story</h1>
             <h3>Map and share your migration story</h3>
             <br>
-			<h3>Share this Story: {{id}}</h3>
-           <a href="http://www.mapmystory.xyz/" class="btn btn-dark btn-lg">Check Out Another Story</a> <button onclick='all_layer_group.snakeIn()'>Re-draw this Story</button>
+			<h3>This Map Title: {{id}}</h3>
+           <!--<button onclick='map.closePopup()' class="btn btn-dark btn-lg"  >Close</button>--> 
+           <a href="http://www.mapmystory.xyz/" class="btn btn-dark btn-lg">Check Out Another Story</a> 
+           <button onclick='all_layer_group.snakeIn()' class="btn btn-dark btn-lg"  >Re-draw this Story</button> 
+           <button onclick='all_layer_group.snakeIn()' class="btn btn-dark btn-lg"  >Share this Story</button>
+           <button onclick='map.removeLayer(all_layer_group); geocoder.expand()' class="btn btn-dark btn-lg"  >Submit Your Story</button>
         </div>
     </header>
         <!-- Map -->

@@ -32,7 +32,7 @@ var map = L.map('map', {
 }).setView([20, 0], 2);
 L.tileLayer('https://a.tiles.mapbox.com/v3/mapbox.world-bright/{z}/{x}/{y}.png').addTo(map);
 
-var geocoder_options = {position: 'topright',expanded: 'true', placeholder: 'Enter your points here!', title: 'Enter your points here!'};
+var geocoder_options = {position: 'topright', placeholder: 'Enter your points here!', title: 'Enter your points here!'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
 // Create one form for entering notes. We will show/hide the form and clear its text as needed.
@@ -294,18 +294,21 @@ function confirmCoord(coordPair,place) {
   //Show confirmation
   var confirmation_msg = document.createElement('div');
   if (allowSubmit()){
-    confirmation_msg.innerHTML = "<strong>Point Added.</strong><br />";
+    confirmation_msg.innerHTML = "<strong>Point Added.</strong><br>";
   } else {
-    confirmation_msg.innerHTML = "<strong>Point Added.</strong> If you made a mistake, <wbr> you may choose an option below.<br />";
+    confirmation_msg.innerHTML = "<strong>Point Added.</strong><br>";
   }
   // Add tooltip to marker showing placename.
   var markerTitle = place.name + "," + place.region + "," + place.country;
   var confirmed_mark = L.circleMarker(coordPair,{title:markerTitle,radius:7,color:'yellow'}).bindPopup(confirmation_msg);
   confirmed_pts.addLayer(confirmed_mark);
-
+  
+  addNext(confirmed_mark);
   addClearThisBtn(confirmed_mark);
   addClearAllBtn(confirmed_mark);
-  geocoder.marker.unbindPopup(); 
+  
+  geocoder.marker.unbindPopup();
+  
 
   if (allowSubmit()){
     addSubmitBtn(confirmed_mark);
@@ -354,6 +357,20 @@ function addClearAllBtn(confirmed_mark){
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 }
 
+function addNext(confirmed_mark){
+  var oldPopup = geocoder.marker.getPopup().getContent();
+  var clearBtn = document.createElement('button');
+  var confirmedLatLng = confirmed_mark.getLatLng();
+  clearBtn.className = "btn btn-default btn-sm";
+  clearBtn.innerHTML = "Enter More Points";
+  clearBtn.addEventListener('click',function(){
+    //Prevent doubletap
+    map.closePopup();
+    geocoder.resetInput();
+  });
+  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+} 
+
 function clearAll(){
   confirmed_pts.clearLayers(); 
 }
@@ -361,7 +378,7 @@ function clearAll(){
 function addSubmitBtn(confirmed_mark){
   var submitBtn = document.createElement('a');
   submitBtn.className = "btn btn-default";
-  submitBtn.innerHTML = "Submit";
+  submitBtn.innerHTML = "Done";
   submitBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
