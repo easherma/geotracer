@@ -19,14 +19,19 @@ body {
 .text-vertical-center {
     display: table-cell;
     text-align: center;
-    vertical-align: middle;
+    vertical-align: bottom;
 }
 
 .text-vertical-center h1 {
     margin: 0;
-    padding: 0;
+    padding-left: 8%;
     font-size: 4.5em;
     font-weight: 700;
+}
+
+.text-vertical-center h3 {
+    text-align: left;
+    padding-left: 8%;
 }
 
 /* Custom Button Styles */
