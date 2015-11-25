@@ -17,16 +17,21 @@ body {
 }
 
 .text-vertical-center {
-    display: table-cell;
+    
     text-align: center;
     vertical-align: bottom;
 }
 
 .text-vertical-center h1 {
-    margin: 0;
-    padding-left: 8%;
+    margin: 2px;
+    padding-left: 9%;
     font-size: 4.5em;
     font-weight: 700;
+}
+
+.row #buttons {
+
+
 }
 
 .text-vertical-center h3 {
@@ -203,7 +208,7 @@ hr.small {
     display: table;
     position: relative;
     width: 100%;
-    height: 20%;
+    height: 5%;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;

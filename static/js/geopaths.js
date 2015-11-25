@@ -371,6 +371,10 @@ function addNext(confirmed_mark){
     //Prevent doubletap
     map.closePopup();
     geocoder.resetInput();
+    $('html, body').animate({
+    scrollTop: $(".leaflet-pelias-control").offset().top
+}, 1000);
+    
   });
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 } 
