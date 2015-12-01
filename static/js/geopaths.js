@@ -432,7 +432,10 @@ function submit(){
     tmp_markers.forEach(function(x){
       user_layer_group.addLayer(x);
       (function(layer){
-        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseover',function(e){
+          addTooltip(e,{
+            'type':'place',
+            'txt':layer.options.title + '\n' + layer.options.note.getNote()});});
         layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
       })(x);
     });
