@@ -49,7 +49,6 @@ var noteForm = function (options){
 
   //Add public methods to 'that'
   var that = {};
-  var other = this;
   that.show = function(){
     myMarkup.removeClass('hide');
     myMarkup.find('textarea').focus();
