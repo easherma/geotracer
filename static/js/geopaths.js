@@ -35,53 +35,13 @@ L.tileLayer('https://a.tiles.mapbox.com/v3/mapbox.world-bright/{z}/{x}/{y}.png')
 var geocoder_options = {position: 'topright', placeholder: 'Enter your points here!', title: 'Enter your points here!'};
 var geocoder =  L.control.geocoder('search-daf-vyw', geocoder_options).addTo(map);
 
-// Create one form for entering notes. We will show/hide the form and clear its text as needed.
-var notesBoxControl = L.Control.extend({
-    options: {
-      position: 'bottomleft'
-    },
-    onAdd: function(map){
-      this.container = $('<div/>')
-        .attr('id','note-form')
-        .addClass('hide col-xs-6 col-md-8 form-group') 
-        .on('click',function(e){
-          // Allows markers to stay open and user to interact with both layers.
-          L.DomEvent.stopPropagation(e);
-         })
-        .append($('<label/>').text("This is a space to share a few words about your submission."))
-        .append($('<textarea/>').addClass("form-control"))
-        .append($('<div/>').addClass('col-xs')
-          .append(
-            $('<i/>')
-              .addClass('fa fa-3x fa-check-circle')
-              .on('click',function(e){e.target.parentElement.parentElement.classList.add('hide');})
-           )
-          .append(
-            $('<i/>')
-              .addClass('fa fa-3x fa-times-circle')
-              .on('click',function(e){
-                e.target.parentElement.parentElement.classList.add('hide');
-                $(e.target.parentElement.parentElement).find('textarea').val("");
-              })
-           )
-         )
-      return this.container.get(0);
-    },
-    show: function(){
-      this.container.removeClass('hide');
-    },
-    hide: function(){
-      this.container.addClass('hide');
-    },
-    clear: function(){
-      this.container.find('textarea').val("");
-    },
-    getNote: function(){
-      return this.container.find('textarea').val();
-    }
-});
-var notesBox = new notesBoxControl();
-map.addControl(notesBox);
+// Create one form instance for entering story-specific notes.
+// The form will sit on the bottom left of the map.
+// We will show/hide the form and clear its text as needed
+// instead of discarding & creating a new instance for each submission.
+var NotesControlClass = L.Control.extend(noteForm({isPopup:false})); 
+var notesControl = new NotesControlClass;
+map.addControl(notesControl);
 
 // this loads data into a leaflet layer
 drawMultipoints(JSON.parse(geoj).features,geoplaces,all_layer_group,false);
@@ -300,16 +260,21 @@ function confirmCoord(coordPair,place) {
   }
   // Add tooltip to marker showing placename.
   var markerTitle = place.name + "," + place.region + "," + place.country;
-  var confirmed_mark = L.circleMarker(coordPair,{title:markerTitle,radius:7,color:'yellow'}).bindPopup(confirmation_msg);
+  var markerOptions = {
+    title :markerTitle,
+    radius : 7,
+    color : 'yellow',
+    note : noteForm({isPopup:true})
+  };
+  var confirmed_mark = L.circleMarker(coordPair,markerOptions).bindPopup(confirmation_msg);
   confirmed_pts.addLayer(confirmed_mark);
   
   addNext(confirmed_mark);
   addClearThisBtn(confirmed_mark);
   addClearAllBtn(confirmed_mark);
-  addNotes(confirmed_mark);
-  
+  addNoteBtn(confirmed_mark);
+  addNoteFormMarkup(confirmed_mark); 
   geocoder.marker.unbindPopup();
-  
 
   if (allowSubmit()){
     addSubmitBtn(confirmed_mark);
@@ -379,24 +344,25 @@ function addNext(confirmed_mark){
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 } 
 
-function addNotes(confirmed_mark){
-  var oldPopup = geocoder.marker.getPopup().getContent();
-  var clearBtn = document.createElement('button');
-  var confirmedLatLng = confirmed_mark.getLatLng();
-  clearBtn.id = "notes";
-  clearBtn.className = "btn btn-dark btn-sm";
-  clearBtn.innerHTML = "Add Notes";
-  clearBtn.addEventListener('click',function(){
-    //Prevent doubletap
-    notesBox.show();
-    $(function() {
-    var $control = $("#note-form");
-    $control.appendTo(".leaflet-popup-content");
-});
+function addNoteBtn(confirmed_mark){
+  var noteBtn = document.createElement('button');
+  noteBtn.id = "notes";
+  noteBtn.className = "btn btn-dark btn-sm";
+  noteBtn.innerHTML = "Add Note";
+  noteBtn.addEventListener('click',function(){
+    $(event.target).next('hr').removeClass('hide');
+    confirmed_mark.options.note.show();
   });
-  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+  confirmed_mark.getPopup().getContent().appendChild(noteBtn);
 } 
 
+function addNoteFormMarkup(confirmed_mark){
+  var hiddenNoteForm = confirmed_mark.options.note.markup;
+  var rule = document.createElement('hr');
+  rule.className = "hide";
+  confirmed_mark.getPopup().getContent().appendChild(rule);
+  confirmed_mark.getPopup().getContent().appendChild(hiddenNoteForm);
+}
 
 function clearAll(){
   confirmed_pts.clearLayers(); 
@@ -423,7 +389,7 @@ function showReadyToSubmit(marker){
   var confirmation_msg = document.createElement('div');
   confirmation_msg.innerHTML = "Are you finished adding <wbr>points to this history?<br />";
   //'Yes' option adds a form to let the user input notes
-  notesBox.show();
+  notesControl.show();
   confirmation_msg.innerHTML += "<button class='btn btn-default' onclick=submit()>Yes</button>";
   //'No' option re-binds previous popup message to the marker.
   var noBtn = document.createElement('div');
@@ -458,7 +424,7 @@ function submit(){
         layer.setStyle(normalLine);
         removeTooltip({'type':'note'});
       });
-    })(confirmed_poly,notesBox.getNote());
+    })(confirmed_poly,notesControl.getNote());
     user_layer_group.addLayer(confirmed_poly);
     confirmed_poly.snakeIn();
 
@@ -469,13 +435,16 @@ function submit(){
     tmp_markers.forEach(function(x){
       user_layer_group.addLayer(x);
       (function(layer){
-        layer.on('mouseover',function(e){addTooltip(e,{'type':'place','txt':layer.options.title});});
+        layer.on('mouseover',function(e){
+          addTooltip(e,{
+            'type':'place',
+            'txt':layer.options.title + '\n' + layer.options.note.getNote()});});
         layer.on('mouseout',function(e){removeTooltip({'type':'place'})});
       })(x);
     });
 
-    notesBox.clear();
-    notesBox.hide();
+    notesControl.clear();
+    notesControl.hide();
   }
 
 }
@@ -485,8 +454,16 @@ function post() {
       
   var geoJ = confirmed_pts.toGeoJSON();
  
-  // Add free-form note arbitrarily to first geojson feature
-  geoJ.features[0].properties['note'] = notesBox.getNote();
+  // Add path-specific note arbitrarily to first geojson feature
+  geoJ.features[0].properties['pathnote'] = notesControl.getNote();
+
+  // Retrieve location-specific notes from markers and add to geoJSON
+  var placeNotes = confirmed_pts.getLayers().map(function(d){
+    return d.options.note.getNote();
+  });
+  geoJ.features.forEach(function(feat,i){
+    feat.properties['placenote'] = placeNotes[i];
+  });
 
   // Parse titles from markers and add to geoJSON representation
   var titles = confirmed_pts.getLayers().map(function(d){
