@@ -451,8 +451,16 @@ function post() {
       
   var geoJ = confirmed_pts.toGeoJSON();
  
-  // Add free-form note arbitrarily to first geojson feature
-  geoJ.features[0].properties['note'] = notesControl.getNote();
+  // Add path-specific note arbitrarily to first geojson feature
+  geoJ.features[0].properties['pathnote'] = notesControl.getNote();
+
+  // Retrieve location-specific notes from markers and add to geoJSON
+  var placeNotes = confirmed_pts.getLayers().map(function(d){
+    return d.options.note.getNote();
+  });
+  geoJ.features.forEach(function(feat,i){
+    feat.properties['placenote'] = placeNotes[i];
+  });
 
   // Parse titles from markers and add to geoJSON representation
   var titles = confirmed_pts.getLayers().map(function(d){
