@@ -48,7 +48,7 @@ var notesBoxControl = L.Control.extend({
           // Allows markers to stay open and user to interact with both layers.
           L.DomEvent.stopPropagation(e);
          })
-        .append($('<label/>').text("This is a space to share a few words about your submission."))
+        .append($('<label/>').text("This is a space to share a few words about this location."))
         .append($('<textarea/>').addClass("form-control"))
         .append($('<div/>').addClass('col-xs')
           .append(
@@ -306,7 +306,7 @@ function confirmCoord(coordPair,place) {
   addNext(confirmed_mark);
   addClearThisBtn(confirmed_mark);
   addClearAllBtn(confirmed_mark);
-  addNotes(confirmed_mark);
+  addNoteBtn(confirmed_mark);
   
   geocoder.marker.unbindPopup();
   
@@ -379,22 +379,20 @@ function addNext(confirmed_mark){
   confirmed_mark.getPopup().getContent().appendChild(clearBtn);
 } 
 
-function addNotes(confirmed_mark){
+function addNoteBtn(confirmed_mark){
   var oldPopup = geocoder.marker.getPopup().getContent();
-  var clearBtn = document.createElement('button');
-  var confirmedLatLng = confirmed_mark.getLatLng();
-  clearBtn.id = "notes";
-  clearBtn.className = "btn btn-dark btn-sm";
-  clearBtn.innerHTML = "Add Notes";
-  clearBtn.addEventListener('click',function(){
-    //Prevent doubletap
+  var noteBtn = document.createElement('button');
+  noteBtn.id = "notes";
+  noteBtn.className = "btn btn-dark btn-sm";
+  noteBtn.innerHTML = "Add Note";
+  noteBtn.addEventListener('click',function(){
     notesBox.show();
     $(function() {
     var $control = $("#note-form");
     $control.appendTo(".leaflet-popup-content");
 });
   });
-  confirmed_mark.getPopup().getContent().appendChild(clearBtn);
+  confirmed_mark.getPopup().getContent().appendChild(noteBtn);
 } 
 
 
