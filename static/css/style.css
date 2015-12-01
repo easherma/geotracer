@@ -2,26 +2,26 @@
   display : none;
 }
 
-#note-form {
+.note-form {
   background-color : white;
   opacity : 0.7;
   border-radius : 4px;
   padding : 4px 4px 4px 4px;
 }
 
-#note-form textarea{
+.note-form textarea{
   resize : none;
   overflow-y: auto;
   font-family : 'fa';
 }
 
-#note-form .fa-check-circle{
+.note-form .fa-check-circle{
   color : green;
   float : right;
   padding : 0 .25em 0 .25em;
 }
 
-#note-form .fa-times-circle{
+.note-form .fa-times-circle{
   color : red;
   float : right;
   padding : 0 .25em 0 .25em;
