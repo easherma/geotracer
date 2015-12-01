@@ -273,9 +273,8 @@ function confirmCoord(coordPair,place) {
   addClearThisBtn(confirmed_mark);
   addClearAllBtn(confirmed_mark);
   addNoteBtn(confirmed_mark);
-  addNoteForm(confirmed_mark); 
+  addNoteFormMarkup(confirmed_mark); 
   geocoder.marker.unbindPopup();
-  
 
   if (allowSubmit()){
     addSubmitBtn(confirmed_mark);
@@ -357,7 +356,7 @@ function addNoteBtn(confirmed_mark){
   confirmed_mark.getPopup().getContent().appendChild(noteBtn);
 } 
 
-function addNoteForm(confirmed_mark){
+function addNoteFormMarkup(confirmed_mark){
   var hiddenNoteForm = confirmed_mark.options.note.markup;
   var rule = document.createElement('hr');
   rule.className = "hide";
