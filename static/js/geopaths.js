@@ -351,6 +351,7 @@ function addNoteBtn(confirmed_mark){
   noteBtn.className = "btn btn-dark btn-sm";
   noteBtn.innerHTML = "Add Note";
   noteBtn.addEventListener('click',function(){
+    $(event.target).next('hr').removeClass('hide');
     confirmed_mark.options.note.show();
   });
   confirmed_mark.getPopup().getContent().appendChild(noteBtn);
@@ -358,6 +359,9 @@ function addNoteBtn(confirmed_mark){
 
 function addNoteForm(confirmed_mark){
   var hiddenNoteForm = confirmed_mark.options.note.markup;
+  var rule = document.createElement('hr');
+  rule.className = "hide";
+  confirmed_mark.getPopup().getContent().appendChild(rule);
   confirmed_mark.getPopup().getContent().appendChild(hiddenNoteForm);
 }
 

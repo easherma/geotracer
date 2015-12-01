@@ -2,6 +2,10 @@
   display : none;
 }
 
+.leaflet-popup-content {
+  overflow-y : hidden;
+}
+
 .note-form {
   background-color : white;
   opacity : 0.7;
@@ -25,6 +29,10 @@
   color : red;
   float : right;
   padding : 0 .25em 0 .25em;
+}
+
+.btn ~ hr {
+  margin: 5px 2px 5px 2px;
 }
 
 .note-tooltip div{

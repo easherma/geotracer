@@ -26,14 +26,20 @@ var noteForm = function (options){
         .append(
           $('<i/>')
             .addClass('fa fa-3x fa-check-circle')
-            .on('click',function(e){e.target.parentElement.parentElement.classList.add('hide');})
+            .on('click',function(e){
+              var container = e.target.parentElement.parentElement;
+              container.classList.add('hide');
+              $(container).prev('hr:not(.hide)').addClass('hide');
+            })
          )
         .append(
           $('<i/>')
             .addClass('fa fa-3x fa-times-circle')
             .on('click',function(e){
-              e.target.parentElement.parentElement.classList.add('hide');
-              $(e.target.parentElement.parentElement).find('textarea').val("");
+              var container = e.target.parentElement.parentElement;
+              container.classList.add('hide');
+              $(container).find('textarea').val("");
+              $(container).prev('hr:not(.hide)').addClass('hide');
              })
          )
        )
