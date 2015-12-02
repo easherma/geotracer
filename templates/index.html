@@ -9,7 +9,7 @@
         <ul class="sidebar-nav">
             <a id="menu-close" href="#" class="btn btn-light btn-lg pull-right toggle"><i class="fa fa-times"></i></a>
             <li class="sidebar-brand">
-                <a href="#top"  onclick = $("#menu-close").click(); >GeoTrails</a>
+                <a href="#top"  onclick = $("#menu-close").click(); >Map My Story</a>
             </li>
             <li>
                 <a href="#map" onclick = $("#menu-close").click(); >Explore the Map</a>
@@ -33,19 +33,39 @@
 
     <!-- Header -->
     <header id="top" class="header">
-        <div class="text-vertical-center">
-            <h1>Map My Story</h1>
-            <h3>Map and share your migration story</h3>
-            <br>
-			<h3>This Map Title: {{id}}</h3>
-           <!--<button onclick='map.closePopup()' class="btn btn-dark btn-lg"  >Close</button>--> 
-           <a href="http://www.mapmystory.xyz/" class="btn btn-dark btn-lg">See Another Story</a> 
+    <div class="row">
+        <div class="text-vertical-center col-md-3"><h1>Map My Story <!--    <span class="h3">  Map and share your migration story--></h1> </div>
+        <div class="text-vertical-center col-md-3"><h2>This Map Title: {{id}}</h2></div>
+        <div id="buttons" class="text-vertical-center col-md-6">
+        <button onclick='all_layer_group.snakeIn()' class="btn btn-dark btn-lg"   >Re-draw this Story</button> 
+        <a href ="#map"> <button onclick='map.removeLayer(all_layer_group); geocoder.expand();  ' class="btn btn-lg btn-dark" style="background-color:#337AB7"  >Submit Your Story</button></a>
+        <a href="/" class="btn btn-dark btn-lg">See Another Story</a>
+        <a href="/{{id}}" target="_blank" class="btn btn-dark btn-lg" >Share this Story</a>           
+        </div>
+      </div>
+    </header>
+
+    <!--
+    <header id="top" class="header">
+        <div class="row">
+        <div class="text-vertical-center" >
+        <h1>Map My Story <!--    <span class="h3">  Map and share your migration story</h1> 
+        </div>
+        <div class="col-md-4" style = "text-align:center">     
+			<h2>This Map Title: {{id}}</h2>
+           <!--<button onclick='map.closePopup()' class="btn btn-dark btn-lg"  >Close</button>-
+        </div>
+        
+        <div id="buttons" class="col-md-4">
            <button onclick='all_layer_group.snakeIn()' class="btn btn-dark btn-lg"  >Re-draw this Story</button> 
-           <button onclick='' class="btn btn-dark btn-lg"  >Share this Story</button>
-           <button onclick='map.removeLayer(all_layer_group); geocoder.expand()' class="btn btn-dark btn-lg"  >Submit Your Story</button>
+           <button onclick='map.removeLayer(all_layer_group); geocoder.expand()' class="btn btn-lg btn-dark" style="background-color:#337AB7"  >Submit Your Story</button>
+           <a href="/" class="btn btn-dark btn-lg">See Another Story</a>
+           <a href="/{{id}}" target="_blank" class="btn btn-dark btn-lg" >Share this Story</a>
+           
         </div>
     </header>
-        <!-- Map -->
+    </div> -->
+     <!-- Map -->
     <section id="map" class="map">
         <div id='map' class='dark'></div>
     <br>
@@ -61,12 +81,13 @@
     <script>
       var prevRowId = {{ last_row_id }};
     </script>
+    <script src="{{ url_for('static', filename='js/notes.js') }}"></script>
     <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
     </section>
     <!-- Services -->
     <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
 <div>
-<button type="button" class="btn btn-lg btn-dark" data-toggle="modal" data-target="#myModal" data-backdrop="false">Add My Story!</button>
+<button type="button" class="hidden btn btn-lg btn-dark" data-toggle="modal" data-target="#myModal" data-backdrop="false">Add My Story!</button>
 
 <div class="modal" id="myModal">
 	<div class="modal-dialog">
