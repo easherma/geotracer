@@ -401,7 +401,7 @@ function clearAll(){
 function addSubmitBtn(confirmed_mark){
   var submitBtn = document.createElement('a');
   submitBtn.className = "btn btn-dark btn-sm";
-  submitBtn.innerHTML = "Done";
+  submitBtn.innerHTML = "Submit My Story";
   submitBtn.addEventListener('click',function(){
     //Prevent doubletap
     map.closePopup();
