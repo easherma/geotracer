@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    
+
 <!-- Navigation -->
     <a id="menu-toggle" href="#" class="btn btn-dark btn-lg toggle"><i class="fa fa-bars"></i></a>
     <nav id="sidebar-wrapper">
@@ -27,8 +27,8 @@
     </nav>
         <script>
         var title = "Where do you live?";
-        document.getElementsByClassName("modal-title").innerHTML = "Where do you live?"; 
-        
+        document.getElementsByClassName("modal-title").innerHTML = "Where do you live?";
+
         </script>
 
     <!-- Header -->
@@ -37,46 +37,26 @@
         <div class="text-vertical-center col-md-3"><h1>Map My Story <!--    <span class="h3">  Map and share your migration story--></h1> </div>
         <div class="text-vertical-center col-md-3"><h2>This Map Title: {{id}}</h2></div>
         <div id="buttons" class="text-vertical-center col-md-6">
-        <button onclick='all_layer_group.snakeIn()' class="btn btn-dark btn-lg"   >Re-draw this Story</button> 
+        <button onclick='all_layer_group.snakeIn()' class="btn btn-dark btn-lg"   >Re-draw this Story</button>
         <a href ="#map"> <button onclick='map.removeLayer(all_layer_group); geocoder.expand();  ' class="btn btn-lg btn-dark" style="background-color:#337AB7"  >Submit Your Story</button></a>
         <a href="/" class="btn btn-dark btn-lg">See Another Story</a>
-        <a href="/{{id}}" target="_blank" class="btn btn-dark btn-lg" >Share this Story</a>           
+        <a href="/{{id}}" target="_blank" class="btn btn-dark btn-lg" >Share this Story</a>
         </div>
       </div>
     </header>
 
-    <!--
-    <header id="top" class="header">
-        <div class="row">
-        <div class="text-vertical-center" >
-        <h1>Map My Story <!--    <span class="h3">  Map and share your migration story</h1> 
-        </div>
-        <div class="col-md-4" style = "text-align:center">     
-			<h2>This Map Title: {{id}}</h2>
-           <!--<button onclick='map.closePopup()' class="btn btn-dark btn-lg"  >Close</button>-
-        </div>
-        
-        <div id="buttons" class="col-md-4">
-           <button onclick='all_layer_group.snakeIn()' class="btn btn-dark btn-lg"  >Re-draw this Story</button> 
-           <button onclick='map.removeLayer(all_layer_group); geocoder.expand()' class="btn btn-lg btn-dark" style="background-color:#337AB7"  >Submit Your Story</button>
-           <a href="/" class="btn btn-dark btn-lg">See Another Story</a>
-           <a href="/{{id}}" target="_blank" class="btn btn-dark btn-lg" >Share this Story</a>
-           
-        </div>
-    </header>
-    </div> -->
      <!-- Map -->
     <section id="map" class="map">
         <div id='map' class='dark'></div>
     <br>
-    
+
     <br>
     <p id="array-warn" style="color: red;"></p>
     <script>
       var geoj = {{carto_geoj|tojson}};
     </script>
     <script>
-      var geoplaces = {{ carto_places|tojson }}; 
+      var geoplaces = {{ carto_places|tojson }};
     </script>
     <script>
       var prevRowId = {{ last_row_id }};
@@ -85,65 +65,18 @@
     <script src="{{ url_for('static', filename='js/geopaths.js') }}"></script>
     </section>
     <!-- Services -->
-    <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
-<div>
-<button type="button" class="hidden btn btn-lg btn-dark" data-toggle="modal" data-target="#myModal" data-backdrop="false">Add My Story!</button>
 
-<div class="modal" id="myModal">
-	<div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h4 class="modal-title">Modal title</h4>
-        </div><div class="container"></div>
-        <div class="modal-body" id='input'>
-          <div class="container" id="form">
-        <form class="form-horizontal" role="form">
-          <div class="form-group">
-            <label for="inputfield1" class="col-sm-2 control-label">Input 1</label>
-            <div class="col-sm-10" id="input">
-              
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="inputfield2" class="col-sm-2 control-label">Input 2</label>
-            <div class="col-sm-10 controls">
-              <div class="input-group">
-                <input type="text" class="form-control" id="inputfield2" placeholder="Input 2">
-                <span class="input-group-addon">.00</span>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="inputfield3" class="col-sm-2 control-label">Input 3</label>
-            <div class="col-sm-10">
-              <input type="text" class="form-control" id="inputfield3" placeholder="Input 3">
-            </div>
-          </div>      
-        </form>
-    </div>
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal2">Open Modal</button>
-        </div>
-        <div class="modal-footer">
-          <a href="#" data-dismiss="modal" class="btn">Close</a>
-          <a href="#" class="btn btn-primary">Save changes</a>
-        </div>
-      </div>
-    </div>
-</div>
-</div>
 
     <section id="services" class="services bg-primary">
-    
+
             <div class="row text-left">
                 <div class="col-lg-10 col-lg-offset-1">
                     <h2>How to add and trace your story:</h2>
-					<span class="lead"> 
-                    
+					<span class="lead">
+
 <ol><li>Submit up to five locations that describe several generations of your family, beginning with you and where you currently live.</li>
 <li>You'll need to submit at least two points.</li>
-<li>Each location should be significant to that generation: a birthplace, where they lived for a long time, or identify strongly with that place for any reason.</li> 
+<li>Each location should be significant to that generation: a birthplace, where they lived for a long time, or identify strongly with that place for any reason.</li>
 <li>Add an optional note about you or your trace, for others to see.</li>
 </ol>
 <p>Once you submit your locations, we'll trace them on the map, where you can also see other people's family histories.</p></span>
@@ -161,7 +94,7 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <a href="#map" class="btn btn-lg btn-light">Add Your Story!</a>
-                    <a href="#signup" class="btn btn-lg btn-dark">Stay In Touch!</a> 
+                    <a href="#signup" class="btn btn-lg btn-dark">Stay In Touch!</a>
                 </div>
             </div>
         </div>
@@ -183,7 +116,7 @@ Map My Story was used to bring these stories together, and to combine the rich, 
 
                 </div>
                 <div class="col-lg-5 col-lg-offset-1 text-center">
-                            <iframe id='signup' src="https://docs.google.com/forms/d/1JYwnBkVeSqjPiL-HYAwGIjs1RL285Aiy5mJVAoQbllM/viewform?embedded=true" width="100%" height="465" frameborder="0" marginheight="0" marginwidth="0" scrolling="no">Loading...</iframe> 
+                            <iframe id='signup' src="https://docs.google.com/forms/d/1JYwnBkVeSqjPiL-HYAwGIjs1RL285Aiy5mJVAoQbllM/viewform?embedded=true" width="100%" height="465" frameborder="0" marginheight="0" marginwidth="0" scrolling="no">Loading...</iframe>
                 </div>
             </div>
             <!-- /.row -->
@@ -199,7 +132,7 @@ Map My Story was used to bring these stories together, and to combine the rich, 
                 <div class="col-lg-10 col-lg-offset-1 text-center">
                     </h4>
                     <ul class="list-unstyled">
-                        <li><i class="fa fa-github fa-fw"></i> <a href="https://github.com/easherma/geotrails">https://github.com/easherma/geotrails</a></li>
+                        <li><i class="fa fa-github fa-fw"></i> <a href="https://github.com/easherma/geotracer">https://github.com/easherma/geotracer</a></li>
                         <li><i class="fa fa-envelope-o fa-fw"></i>  <a href="geospecialtrails@gmail.com">geospecialtrails@gmail.com</a>
                         </li>
                     </ul>
@@ -219,7 +152,7 @@ Map My Story was used to bring these stories together, and to combine the rich, 
 	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-	
+
 	  ga('create', 'UA-69806703-1', 'auto');
 	  ga('send', 'pageview');
 	</script>
