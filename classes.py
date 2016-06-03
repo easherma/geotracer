@@ -2,10 +2,9 @@ from flask import Flask
 from flask import render_template
 from flask import views
 import os
-from flask import render_template, request, redirect, url_for, jsonify, Markup
+from flask import render_template, request, redirect, url_for, jsonify
 from cartodb import CartoDBAPIKey, CartoDBException
 import json
-import markdown
 #import keys
 
 
@@ -17,39 +16,21 @@ cartodb_key = "944ec72c2326e3bd2a5f297f1bec4b8e7a412ab0"
 cartodb_user= "geotrails"
 
 
-@app.route('/')
-def index():
-    cl = CartoDBAPIKey('',cartodb_user)
-    try:
-        about = str("Open Open Open")
-        instructions = """
-How did you get here?
-=======
+class fetch_DB(object):
+    """docstring for """
+    def __init__(self, arg):
+        super(, self).__init__()
+        self.arg = arg
+        #initial query
+class site_content(object):
+    """docstring for """
+    def __init__(self, arg):
+        super(, self).__init__()
+        self.arg = arg
+        #title
+        #instructions
+        #about
 
-Submit up to five points that describe how you got to the conference, from orgin to destination. Use the geocoder to be as specific as you'd like!
--------
-
-* You'll need to submit at least two points.
-* Add an optional note about you or your trace, for others to see.
-"""
-
-        instructions = Markup(markdown.markdown(instructions))
-        carto_geoj = cl.sql("SELECT * FROM points;", format='geojson')
-        id = "All"
-        #TODO: Parse array of strings, not array of objects as place labels
-        labels_resp = cl.sql("SELECT pelias_label FROM points ")
-        labels = [[y for y in json.loads(x['pelias_label'])] for x in labels_resp['rows']]
-        last_row_id_resp = cl.sql("SELECT MAX(cartodb_id) AS id FROM points")
-        last_row_id = last_row_id_resp['rows'][0]['id']
-
-    except CartoDBException as e:
-        print("some error ocurred", e)
-    return render_template('index.html',
-                           carto_geoj=json.dumps(carto_geoj),
-                           carto_places=labels,
-                           last_row_id=last_row_id, id=id, instructions=instructions)
-
-@app.route('/all')
 def all():
     cl = CartoDBAPIKey('',cartodb_user)
     try:
@@ -68,13 +49,13 @@ def all():
                            carto_geoj=json.dumps(carto_geoj),
                            carto_places=labels,
                            last_row_id=last_row_id, id=id)
-@app.route('/SOTM')
+@app.route('/custom')
 def custom():
     cl = CartoDBAPIKey('',cartodb_user)
     group_id = ''
     try:
         carto_geoj = cl.sql("SELECT * FROM points WHERE session_id = 4;", format='geojson')
-
+        about = str("Open Open Open")
         id = "Custom"
         #TODO: Parse array of strings, not array of objects as place labels
         labels_resp = cl.sql("SELECT pelias_label FROM points ")
