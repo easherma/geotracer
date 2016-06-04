@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SOTM</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.css">
+  <script src="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
+  <script src="L.Polyline.SnakeAnim.js"></script>
+  <style>
+    #map {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+    }
+    html,body{margin: 0; padding: 0}
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+  function plotUser() {
+
+    function plotMarkers ( latlng ) {
+      L.marker( latlng ).addTo(map);
+    };
+    var markers = userCoords.forEach(plotMarkers);
+    return markers;
+  }
+
+    var map = L.map('map').setView([37.804146, -122.275045], 16);
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    }).addTo(map);
+    var markers = [];
+    //Use your own API key in place of search-xxxxxx. Get a key at mapzen.com/developers.
+    var geocoder = L.control.geocoder('search-daf-vyw').addTo(map);
+    var userCoords = [];
+    //var userLabels = [];
+    //var userStories = [];
+    var allGeo= {
+  "type": "FeatureCollection",
+  "features": []
+
+};
+    var features = [];
+    L.geoJson(features).addTo(map); //storypoints
+    //var polyline = L.polyline(
+    //sessionStorage.setItem("story", JSON.stringify(userStories));
+    userLayer = L.featureGroup();
+    var allStories = [];
+    geocoder.on('select', function (e) {
+  //get the selected feature, push it to a features array
+  features.push(e.feature);
+
+
+  //console.log(userStories);
+  //console.log('You’ve selected', e.feature.properties.label);
+  console.log(e.feature);
+  //console.log('You’ve selected', e.feature.geometry.coordinates);
+  //var selection = {"label":e.feature.properties.label, "coords":e.feature.geometry.coordinates};
+  //userStories.push({"label":e.feature.properties.label, "coords":e.feature.geometry.coordinates});
+  //userLabels.push(e.feature.properties.label)
+  //pushCoordsforPolyline
+  userCoords.push(e.latlng);
+  console.log(e.latlng)
+  if (userCoords.length > 1)
+{
+  var polyline = L.polyline(userCoords)
+  features.push(polyline.toGeoJSON())
+}
+  //return polyline;
+//  userLayer.bindPopup("TESTING" + userLabels[0] + " to: " + userLabels[1]);
+//  userLayer.addTo(map);
+
+});
+
+function submitStory() {
+  allStories.push([userStories]);
+  userStories = []
+  //selection = []
+}
+
+function submitGeoj() {
+  /*function addFeature(i) {
+    allGeo.features.push(features[index])
+  };
+  if (allGeo.features) {
+    features.forEach(addFeature);
+  } else {
+      allGeo.features = features;
+  }*/
+
+  features.forEach(function(i) {allGeo.features.push(i)});
+  userCoords = [];
+  console.log(JSON.stringify(allGeo));
+  features = [];
+
+}
+
+//allGeo.features[0]['geometry']['type']
+
+
+
+  </script>
+</body>
+</html>
