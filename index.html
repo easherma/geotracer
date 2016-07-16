@@ -44,25 +44,20 @@
   "features": []
 
 };
+    sessionStorage.setItem("stories", "");
+    if (sessionStorage > 1) 
+    {var allGeo2 = JSON.parse(sessionStorage.stories)}
     var features = [];
     L.geoJson(features).addTo(map); //storypoints
     //var polyline = L.polyline(
-    //sessionStorage.setItem("story", JSON.stringify(userStories));
+
     userLayer = L.featureGroup();
     var allStories = [];
     geocoder.on('select', function (e) {
   //get the selected feature, push it to a features array
   features.push(e.feature);
-
-
-  //console.log(userStories);
-  //console.log('You’ve selected', e.feature.properties.label);
   console.log(e.feature);
-  //console.log('You’ve selected', e.feature.geometry.coordinates);
-  //var selection = {"label":e.feature.properties.label, "coords":e.feature.geometry.coordinates};
-  //userStories.push({"label":e.feature.properties.label, "coords":e.feature.geometry.coordinates});
-  //userLabels.push(e.feature.properties.label)
-  //pushCoordsforPolyline
+
   userCoords.push(e.latlng);
   console.log(e.latlng)
   if (userCoords.length > 1)
@@ -70,7 +65,7 @@
   var polyline = L.polyline(userCoords)
   features.push(polyline.toGeoJSON())
 }
-  //return polyline;
+//return polyline;
 //  userLayer.bindPopup("TESTING" + userLabels[0] + " to: " + userLabels[1]);
 //  userLayer.addTo(map);
 
@@ -83,18 +78,11 @@ function submitStory() {
 }
 
 function submitGeoj() {
-  /*function addFeature(i) {
-    allGeo.features.push(features[index])
-  };
-  if (allGeo.features) {
-    features.forEach(addFeature);
-  } else {
-      allGeo.features = features;
-  }*/
 
   features.forEach(function(i) {allGeo.features.push(i)});
   userCoords = [];
   console.log(JSON.stringify(allGeo));
+  sessionStorage.setItem("stories", JSON.stringify(allGeo));
   features = [];
 
 }
